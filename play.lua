@@ -1,8 +1,10 @@
+-- https://docs.coronalabs.com/api/library/composer/index.html
 local composer = require( "composer" )
- 
 local scene = composer.newScene()
 
+-- https://docs.coronalabs.com/api/library/physics/index.html
 local physics = require ("physics")
+-- stage = tamaño pantalla
 _G.stage = display.getCurrentStage()
 physics.setDrawMode("normal")
 physics.start() 
@@ -19,13 +21,18 @@ physics.setPositionIterations(10)
  local planet1
  local planet2
  local player
+ local floor
+ local alien
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
- 
--- create()
 
+-- ------------------------------------------------------
+-- scrollElement()
+-- 
+-- Hace "girar" en la pantalla los elementos del fondo
+-- ------------------------------------------------------
 local function scrollElement(self, event)
     if self.x < (display.contentWidth-self.width)*(-1) then
         self.x = display.contentWidth+self.width
@@ -35,46 +42,67 @@ local function scrollElement(self, event)
     end
 end
 
-
+-- ------------------------------------------------------
+-- touchAction()
+--
+-- Funcion a ejecutar cuando se toque al personaje
+-- para hacerlo brincar
+-- ------------------------------------------------------
 local function touchAction( event )
     if event.phase == "began" then
+        -- velocidad en x = 0
+        -- velocidad en y = 800
         player:setLinearVelocity(0,800)
+
         player:applyLinearImpulse( nil, 800, player.x, player.y )
     end
 end
 
+-- ------------------------------------------------------
+-- onCollision()
+--
+-- En proceso ...
+-- ------------------------------------------------------
 local function onCollision(self, event)
+
     if event.phase == "began" then
-        if self.type == "obstacle" then
-            print("collision")
-        end
+        ---if event.object2.type == "obstacle" then
+            print(event.object2.type)
+        --end
     end
 end
 
-
+-- ------------------------------------------------------
+-- create()
+-- Crea una nueva escena inicializando sus elementos
+-- 
+-- ------------------------------------------------------
 function scene:create( event )
  
+ -- esto es de composer pero la verdad no se que es :B
     local sceneGroup = self.view
 
     -- BACKGROUND
-    bg = display.newImage("images/superficie.jpg")
-            bg.x = 150
-            bg.y = 160
+    bg = display.newImage("images/superficie.jpg")-- mostrar la imagen en pantalla
+            bg.x = 150 -- pos en x
+            bg.y = 160 -- pos en y
             bg.type = "bg"
-    sceneGroup:insert(bg)
+    sceneGroup:insert(bg) --agrega el elemento a la escena
 
     -- PLANETS
     planet1 = display.newImage("images/planet1.png")
             planet1.x = 50
             planet1.y = 80
-            planet1.speed = 1/2
+            planet1.speed = 1/2 -- atributo de plantet1 que determina la velocidad con la que se movera en pantalla
             planet1.type = "bg"
+
     planet2 = display.newImage("images/planet2.png")
             planet2.x = 320
             planet2.y = 90
             planet2.speed = 1/2
             planet2.type = "bg"
-    planet1.enterFrame = scrollElement
+
+    planet1.enterFrame = scrollElement -- evento
     Runtime:addEventListener("enterFrame", planet1)
 
     planet2.enterFrame = scrollElement
@@ -86,10 +114,12 @@ function scene:create( event )
             alien.y = stage.height - alien.height/2 - 10
             alien.speed = 2.5
             alien.type = "obstacle"
-
-    --physics.addBody(alien, "dynamic", {density=3, bounce = 0})
+    
+    -- al ser "static" es posible que gire en la pantalla
+    physics.addBody(alien, "static", {density=3, bounce = 0})
     alien.enterFrame = scrollElement
     Runtime:addEventListener("enterFrame", alien)
+    sceneGroup:insert(alien)
 
     -- PIEDRA
     piedra = display.newImage("images/piedra.png")
@@ -105,18 +135,18 @@ function scene:create( event )
             player.x = 50
             player.y = 180
 
+    -- agrega elemento a physics
     physics.addBody(player, "dynamic", {density=3, bounce = 0})
-    --physics.addBody(alien, "dynamic", {density=3, bounce = 0})
-    --alien:setLinearVelocity(-200)
     Runtime:addEventListener("touch", touchAction)
 
     --  EN PROCESO----------------------------------------------
-    --alien.collision = onCollision
-    --Runtime:addEventListener("collision", alien)
+    player.collision = onCollision
+    Runtime:addEventListener("collision", player)
     -------------------------------------------------------
     -- FLOOR
-    local floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
+    floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
     floor.type = "ground"
+    -- "statuc" indica que sera un objeto sin movimiento
     physics.addBody(floor, "static")
     floor.y = stage.height - 10
 
