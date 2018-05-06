@@ -62,7 +62,8 @@ local function handleButtonEvent(event)
     local id = event.target.id
     if "ended" == phase then
         if id == "Pause" then
-        	BotonPausa:setEnabled("false")
+        	print("wtf")
+        	BotonPausa:setEnabled()
         	temporaryspeed = speed
         	speed = 0
         	counterStatus = false
