@@ -49,18 +49,18 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     bg = display.newImage("images/MenuPrincipal.png")-- mostrar la imagen en pantalla
-                    bg.x = centerX -- pos en x
-                    bg.y = centerY -- pos en y
-                    bg.width = screenWidth
-                    bg.height = screenHeight
+            bg.x = centerX -- pos en x
+            bg.y = centerY -- pos en y
+            bg.width = screenWidth
+            bg.height = screenHeight
     sceneGroup:insert(bg)
 
     local BotonJugar = widget.newButton
         {
-            left = 211,
-            top = 111,
-            width = 150,
-            height = 40,
+            left = 220,
+            top = 123,
+            width = 135,
+            height = 33,
             defaultFile = "images/B.Play.png",
             overFile="images/B.PlayPressed.png",
             id = "Jugar",
@@ -70,10 +70,10 @@ function scene:create( event )
 
         local BotonCred = widget.newButton
         {
-            left = 211,
-            top = 160,
-            width = 150,
-            height = 40,
+            left = 220,
+            top = 165,
+            width = 135,
+            height = 33,
             defaultFile = "images/B.Creditos.png",
             overFile="images/B.CreditosPressed.png",
             id= "Creditos",

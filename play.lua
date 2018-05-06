@@ -11,7 +11,16 @@ physics.setDrawMode("normal")
 physics.start() 
 physics.setGravity(0, 40)
 physics.setPositionIterations(10)
-
+centerX = display.contentCenterX
+centerY = display.contentCenterY
+screenLeft = display.screenOriginX
+screenWidth = display.contentWidth - screenLeft * 2
+screenRight = screenLeft * screenWidth
+screenTop = display.screenOriginY
+screenHeight = display.contentHeight - screenTop * 2
+screenBottom = screenTop + screenHeight 
+display.contentWidht = screendWidth
+display.contentHeight = screenHeight
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -127,6 +136,16 @@ local function scrollElement(self, event)
     end
 end
 
+local function scrollElementPiso(self, event)
+    self.speed=speed
+    if self.x < (display.contentWidth/2)*(-1) then
+        self.x = display.contentWidth+self.width
+        --self.y = stage.height - alien.height/2 - math.random(5,20)
+    else
+        self.x = self.x - self.speed
+    end
+end
+
 -- ------------------------------------------------------
 -- touchAction()
 --
@@ -138,7 +157,7 @@ local function touchAction( event )
 	print("pausestatus",pauseStatus)
 	if pauseStatus  == false then
 		print("playerstatus",playerStatus)
-		if player.y >= 234 then
+		if player.y >= 219 then
 			print(event.phase)
 			print(phase)
 		    if phase == "began"  then
@@ -194,36 +213,85 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- BACKGROUND
-    bg = display.newImage("images/superficie.jpg")-- mostrar la imagen en pantalla
-            bg.x = 150 -- pos en x
-            bg.y = 160 -- pos en y
+    bg = display.newImage("images/FondoJuego.png")-- mostrar la imagen en pantalla
+                    bg.x = centerX -- pos en x
+                    bg.y = centerY -- pos en y
+                    bg.width = screenWidth
+                    bg.height = screenHeight
             bg.type = "bg"
     sceneGroup:insert(bg) --agrega el elemento a la escena
 
+
     -- PLANETS
-    planet1 = display.newImage("images/planet1.png")
+    planet1 = display.newImage("images/1.png")
             planet1.x = 50
-            planet1.y = 80
+            planet1.y = 50
             planet1.speed = speed -- atributo de plantet1 que determina la velocidad con la que se movera en pantalla
             planet1.type = "bg"
+    planet1.enterFrame = scrollElement
+    sceneGroup:insert(planet1)
 
-
-    planet2 = display.newImage("images/planet2.png")
-            planet2.x = 320
-            planet2.y = 90
+    planet2 = display.newImage("images/2.png")
+            planet2.x = 250
+            planet2.y = 110
             planet2.speed = speed
             planet2.type = "bg"
-
-    planet1.enterFrame = scrollElement -- evento
-    --Runtime:addEventListener("enterFrame", planet1)
-    sceneGroup:insert(planet1)
     planet2.enterFrame = scrollElement
-    --Runtime:addEventListener("enterFrame", planet2)
-    sceneGroup:insert(planet2)
+    sceneGroup:insert(planet2)      
+
+    planet3 = display.newImage("images/3.png")
+            planet3.x = 350
+            planet3.y = 125
+            planet3.speed = speed
+            planet3.type = "bg"
+    planet3.enterFrame = scrollElement
+    sceneGroup:insert(planet3)
+
+    planet4 = display.newImage("images/4.png")
+            planet4.x = 450
+            planet4.y = 80
+            planet4.speed = speed
+            planet4.type = "bg"
+    planet4.enterFrame = scrollElement
+    sceneGroup:insert(planet4)
+
+    planet5 = display.newImage("images/3.png")
+            planet5.x = 650
+            planet5.y = 50
+            planet5.speed = speed
+            planet5.type = "bg"
+    planet5.enterFrame = scrollElement
+    sceneGroup:insert(planet5)     
+
+    planet6 = display.newImage("images/2.png")
+            planet6.x = 800
+            planet6.y = 100
+            planet6.speed = speed
+            planet6.type = "bg"
+    planet6.enterFrame = scrollElement
+    sceneGroup:insert(planet6)     
+
+    planet7 = display.newImage("images/4.png")
+            planet7.x = 850
+            planet7.y = 140
+            planet7.speed = speed
+            planet7.type = "bg"
+    planet7.enterFrame = scrollElement
+    sceneGroup:insert(planet7) 
+
+    planet8 = display.newImage("images/3.png")
+            planet8.x = 700
+            planet8.y = 135
+            planet8.speed = speed
+            planet8.type = "bg"
+    planet8.enterFrame = scrollElement
+    sceneGroup:insert(planet8) 
+
+
     -- ALIEN
     alien = display.newImage("images/alien.png")
-            alien.x = 500
-            alien.y = stage.height - alien.height/2 - 10
+            alien.x = 800
+            alien.y = stage.height - alien.height/2 - 150
             alien.speed = 2.5
             alien.type = "obstacle"
     
@@ -236,7 +304,7 @@ function scene:create( event )
     -- PIEDRA
     piedra = display.newImage("images/piedra.png")
             piedra.x = 900
-            piedra.y = stage.height - piedra.height/2 - 15
+            piedra.y = 100
             piedra.speed = 2.5
             piedra.type = "obstacle"
     piedra.enterFrame = scrollElement
@@ -261,9 +329,26 @@ function scene:create( event )
     -- FLOOR
     floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
     floor.type = "SUELO"
-    -- "statuc" indica que sera un objeto sin movimiento
     physics.addBody(floor, "static", {bounce = 0})
-    floor.y = stage.height - 10
+    floor.y = stage.height - 27
+
+    -- "static" indica que sera un objeto sin movimiento
+    piso1 = display.newImage("images/Piso.png")
+    piso1.y = stage.height - 14
+    piso1.x = display.contentCenterX
+    sceneGroup:insert(piso1)
+    piso1.enterFrame = scrollElementPiso
+    piso1.speed = 2.5
+    piso2 = display.newImage("images/Piso.png")
+    piso2.y = stage.height - 14
+    piso2.x = 800
+    sceneGroup:insert(piso2)
+    piso2.enterFrame = scrollElementPiso
+    piso2.speed = 2.5
+
+    sceneGroup:insert(piso1)
+    sceneGroup:insert(piso2)
+
 
      BotonPausa = widget.newButton
         {
@@ -297,11 +382,11 @@ function scene:show( event )
         counterStatus = true
 
         alien.x = 500
-            alien.y = stage.height - alien.height/2 - 10
+            alien.y = stage.height - alien.height/2 - 27
             alien.speed = 2.5
 
         piedra.x = 900
-            piedra.y = stage.height - piedra.height/2 - 15
+            piedra.y = stage.height - piedra.height/2 - 27
             piedra.speed = 2.5
 
             player.x = 50
@@ -323,8 +408,14 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         Runtime:addEventListener("enterFrame", planet1)
         Runtime:addEventListener("enterFrame", planet2)
+        Runtime:addEventListener("enterFrame", planet3)
+        Runtime:addEventListener("enterFrame", planet4)
+        Runtime:addEventListener("enterFrame", planet5)
+        Runtime:addEventListener("enterFrame", planet6)
         Runtime:addEventListener("enterFrame", alien)
         Runtime:addEventListener("enterFrame", piedra)
+        Runtime:addEventListener("enterFrame", piso1)
+        Runtime:addEventListener("enterFrame", piso2)
         Runtime:addEventListener("touch", touchAction)
         Runtime:addEventListener("collision", player)
         --pauseStatus  = false
