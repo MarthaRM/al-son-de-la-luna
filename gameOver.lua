@@ -19,10 +19,10 @@ local function againButtonEvent (event)
     if "ended" == phase then
         if event.target.id == "main" then
             print ("main")
-            composer.gotoScene("play", {effect = "fade", time = 500})
+            composer.gotoScene("menu", {effect = "fade", time = 500})
         elseif event.target.id == "again" then
             print("again")
-            -- composer.gotoScene("main", {effect = "fade", time = 500})
+            composer.gotoScene("play", {effect = "fade", time = 500})
         end
     end
 end
