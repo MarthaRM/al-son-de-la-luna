@@ -33,7 +33,8 @@ physics.setPositionIterations(10)
  local BotonMenu
  local temporaryspeed
  local BotonPausa
- 
+ local pauseStatus =false
+ local playerStatus = false
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -47,11 +48,20 @@ local function BotonesPausa(event)
 			BotonMenu:removeSelf()
 			speed = temporaryspeed
         	counterStatus = true
-        	BotonPausa:setEnabled("true")
+        	BotonPausa:setEnabled(true)
+        	pauseStatus  = false
+        	playerStatus=false
+        	print("start reanudar ",playerStatus)
+        	physics.start()
 		elseif id =="Menu" then
 			BotonReanudar:removeSelf()
 			BotonMenu:removeSelf()
+			
+
+       		playerStatus=false
 			composer.gotoScene("menu",{effect="fade",time=500})
+
+
 
 		end
 	end
@@ -63,11 +73,16 @@ local function handleButtonEvent(event)
     if "ended" == phase then
         if id == "Pause" then
         	print("wtf")
-        	BotonPausa:setEnabled()
+        	--physics.addBody(player, "static", {density=0.65, bounce = 0.2})
+        	BotonPausa:setEnabled(false)
         	temporaryspeed = speed
         	speed = 0
         	counterStatus = false
-            
+        	print("pause pausa",playerStatus)
+        	physics.pause()
+            --player.x = player.x
+            --player.y = player.y
+            pauseStatus  = true
 		     BotonReanudar = widget.newButton
 		        {
 		            left = stage.width/2 - 75,
@@ -119,13 +134,28 @@ end
 -- para hacerlo brincar
 -- ------------------------------------------------------
 local function touchAction( event )
-    if event.phase == "began" then
-        -- velocidad en x = 0
-        -- velocidad en y = 800
-        player:setLinearVelocity(0,800)
+	local phase = event.phase
+	print("pausestatus",pauseStatus)
+	if pauseStatus  == false then
+		print("playerstatus",playerStatus)
+		if player.y >= 234 then
+			print(event.phase)
+			print(phase)
+		    if phase == "began"  then
+		        -- velocidad en x = 0
+		        -- velocidad en y = 800
+		       
+		        player:setLinearVelocity(0,800)
 
-        player:applyLinearImpulse( nil, 800, player.x, player.y )
-    end
+		        player:applyLinearImpulse( nil, 800, player.x, player.y )
+		        print("salta")
+		    end
+		    playerStatus = true
+		   	
+
+		end
+	end
+
 end
 
 -- ------------------------------------------------------
@@ -143,6 +173,11 @@ local function onCollision(self, event)
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
                 --composer.removeScene( "play",true )
+            else--if event.object2.type == "SUELO" then
+            	
+            	playerStatus = false
+            	print(player.y)
+
             end
         --end
     end
@@ -272,9 +307,19 @@ function scene:show( event )
             player.x = 50
           	player.y = 180
 
+         pauseStatus  = false
+		 BotonPausa:setEnabled(true)
+
+
+		 
+
         player:setLinearVelocity(0,800)
 		currentTimeText.text="Puntaje: "..0
- 
+		playerStatus=false
+		print("start will phase",playerStatus)
+		physics.start()
+ 		 
+
     elseif ( phase == "did" ) then
         Runtime:addEventListener("enterFrame", planet1)
         Runtime:addEventListener("enterFrame", planet2)
@@ -282,6 +327,11 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", piedra)
         Runtime:addEventListener("touch", touchAction)
         Runtime:addEventListener("collision", player)
+        --pauseStatus  = false
+      	playerStatus=false
+      	print("start did phase ", playerStatus)
+      	physics.start()
+
 
         
 
@@ -298,9 +348,11 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
- 
+ 		BotonPausa:setEnabled()
+ 		
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
+
  
     end
 end
