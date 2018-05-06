@@ -11,7 +11,6 @@ physics.start()
 physics.setGravity(0, 40)
 physics.setPositionIterations(10)
 
-
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -23,7 +22,14 @@ physics.setPositionIterations(10)
  local player
  local floor
  local alien
-
+ local contador = 0
+ local speed = 1
+ local timerUpTimer
+ local currentTimeText = 0
+ local counterStatus = true
+ local triangleShape = { 0,-12, 15,30, -12,30 }
+ local file
+ 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -34,6 +40,7 @@ physics.setPositionIterations(10)
 -- Hace "girar" en la pantalla los elementos del fondo
 -- ------------------------------------------------------
 local function scrollElement(self, event)
+    self.speed=speed
     if self.x < (display.contentWidth-self.width)*(-1) then
         self.x = display.contentWidth+self.width
         --self.y = stage.height - alien.height/2 - math.random(5,20)
@@ -67,7 +74,9 @@ local function onCollision(self, event)
 
     if event.phase == "began" then
         ---if event.object2.type == "obstacle" then
-            print(event.object2.type)
+            if event.object2.type ~= "SUELO" then
+                counterStatus=false
+            end
         --end
     end
 end
@@ -93,13 +102,13 @@ function scene:create( event )
     planet1 = display.newImage("images/planet1.png")
             planet1.x = 50
             planet1.y = 80
-            planet1.speed = 1/2 -- atributo de plantet1 que determina la velocidad con la que se movera en pantalla
+            planet1.speed = speed -- atributo de plantet1 que determina la velocidad con la que se movera en pantalla
             planet1.type = "bg"
 
     planet2 = display.newImage("images/planet2.png")
             planet2.x = 320
             planet2.y = 90
-            planet2.speed = 1/2
+            planet2.speed = speed
             planet2.type = "bg"
 
     planet1.enterFrame = scrollElement -- evento
@@ -116,7 +125,7 @@ function scene:create( event )
             alien.type = "obstacle"
     
     -- al ser "static" es posible que gire en la pantalla
-    physics.addBody(alien, "static", {density=3, bounce = 0})
+    physics.addBody(alien, "static", {shape=triangleShape, density=3, bounce = 0})
     alien.enterFrame = scrollElement
     Runtime:addEventListener("enterFrame", alien)
     sceneGroup:insert(alien)
@@ -136,7 +145,9 @@ function scene:create( event )
             player.y = 180
 
     -- agrega elemento a physics
-    physics.addBody(player, "dynamic", {density=3, bounce = 0})
+    physics.addBody(player, "dynamic", {density=0.65, bounce = 0.2})
+    player.isFixedRotation = true -- PARA QUE NO BAILE EL PERSONAJE
+    player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
     Runtime:addEventListener("touch", touchAction)
 
     --  EN PROCESO----------------------------------------------
@@ -145,11 +156,13 @@ function scene:create( event )
     -------------------------------------------------------
     -- FLOOR
     floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
-    floor.type = "ground"
+    floor.type = "SUELO"
     -- "statuc" indica que sera un objeto sin movimiento
-    physics.addBody(floor, "static")
+    physics.addBody(floor, "static", {bounce = 0})
     floor.y = stage.height - 10
- 
+
+    currentTimeText = display.newText(contador, 400, 20, native.systemFontBold, 24) 
+    currentTimeText:setTextColor(1,1,1)
 end
  
  
@@ -164,7 +177,6 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
- 
     end
 end
  
@@ -192,6 +204,20 @@ function scene:destroy( event )
     -- Code here runs prior to the removal of scene's view
  
 end
+
+
+-- Contador
+local function timerUp()
+    if speed<4 then
+        speed = speed*1.04
+    end
+    if counterStatus == true then
+        contador = contador + 1
+        currentTimeText.text = "Puntaje: "..contador
+    end
+end
+
+timerUpTimer = timer.performWithDelay(1000, timerUp, 0)
  
  
 -- -----------------------------------------------------------------------------------
@@ -202,5 +228,5 @@ scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
 -- -----------------------------------------------------------------------------------
- 
+
 return scene
