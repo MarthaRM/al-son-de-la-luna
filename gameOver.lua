@@ -55,7 +55,7 @@ function scene:create( event )
         overFile = ("images/B.PlayPressed.png"),
         onEvent = againButtonEvent,
     }
-
+    sceneGroup:insert(again)
     main = widget.newButton
     {
         id = "main",
@@ -67,6 +67,7 @@ function scene:create( event )
         overFile = ("images/B.PlayPressed.png"),
         onEvent = againButtonEvent,
     }
+    sceneGroup:insert(main)
 end
  
  

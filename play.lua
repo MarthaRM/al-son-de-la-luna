@@ -23,12 +23,11 @@ physics.setPositionIterations(10)
  local floor
  local alien
  local contador = 0
- local speed = 1
+ local speed = 2
  local timerUpTimer
  local currentTimeText = 0
  local counterStatus = true
- local triangleShape = { 0,-12, 15,30, -12,30 }
- local file
+ local triangleShape = { 0,-12, 12,30, -12,30 }
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -76,6 +75,12 @@ local function onCollision(self, event)
         ---if event.object2.type == "obstacle" then
             if event.object2.type ~= "SUELO" then
                 counterStatus=false
+                speed=0
+                composer.gotoScene("gameOver",{effect="fade", time=500})
+                speed=2
+                contador=0
+                counterStatus = true
+                composer.removeScene( "play",true )
             end
         --end
     end
@@ -113,10 +118,10 @@ function scene:create( event )
 
     planet1.enterFrame = scrollElement -- evento
     Runtime:addEventListener("enterFrame", planet1)
-
+    sceneGroup:insert(planet1)
     planet2.enterFrame = scrollElement
     Runtime:addEventListener("enterFrame", planet2)
-
+    sceneGroup:insert(planet2)
     -- ALIEN
     alien = display.newImage("images/alien.png")
             alien.x = 500
@@ -138,7 +143,7 @@ function scene:create( event )
             piedra.type = "obstacle"
     piedra.enterFrame = scrollElement
     Runtime:addEventListener("enterFrame", piedra)
-
+    sceneGroup:insert(piedra)
     -- PLAYER
     player = display.newImage("images/Personaje.png")
             player.x = 50
@@ -149,6 +154,7 @@ function scene:create( event )
     player.isFixedRotation = true -- PARA QUE NO BAILE EL PERSONAJE
     player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
     Runtime:addEventListener("touch", touchAction)
+    sceneGroup:insert(player)
 
     --  EN PROCESO----------------------------------------------
     player.collision = onCollision
@@ -163,6 +169,7 @@ function scene:create( event )
 
     currentTimeText = display.newText(contador, 400, 20, native.systemFontBold, 24) 
     currentTimeText:setTextColor(1,1,1)
+    sceneGroup:insert(currentTimeText)
 end
  
  
@@ -208,7 +215,7 @@ end
 
 -- Contador
 local function timerUp()
-    if speed<4 then
+    if speed<5 then
         speed = speed*1.04
     end
     if counterStatus == true then
