@@ -1,6 +1,7 @@
 -- https://docs.coronalabs.com/api/library/composer/index.html
 local composer = require( "composer" )
 local scene = composer.newScene()
+local widget = require ("widget")
 
 -- https://docs.coronalabs.com/api/library/physics/index.html
 local physics = require ("physics")
@@ -28,10 +29,85 @@ physics.setPositionIterations(10)
  local currentTimeText = 0
  local counterStatus = true
  local triangleShape = { 0,-12, 12,30, -12,30 }
+ local BotonReanudar
+ local BotonMenu
+ local temporaryspeed
+ local BotonPausa
+ local sceneGroup
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
+local function BotonesPausa(event)
+	local phase = event.phase
+	local id  = event.target.id
+	if "ended" == phase then 
+
+		if id == "Reanudar" then
+			BotonReanudar:removeSelf()
+			BotonMenu:removeSelf()
+			speed = temporaryspeed
+        	counterStatus = true
+        	BotonPausa = widget.newButton
+        {
+            left = 400,
+            top = 20,
+            width = 50,
+            height = 50,
+            defaultFile = "images/B.Pause.png",
+            overFile="images/B.Pause.png",
+            id = "Pause",
+            onEvent = handleButtonEvent,
+        }
+    	sceneGroup:insert(BotonPausa)
+		elseif id =="Menu" then
+			BotonReanudar:removeSelf()
+			BotonMenu:removeSelf()
+			composer.gotoScene("menu",{effect="fade",time=500})
+
+
+		end
+	end
+end
+
+local function handleButtonEvent(event)
+	local phase = event.phase
+    local id = event.target.id
+    if "ended" == phase then
+        if id == "Pause" then
+        	BotonPausa:removeSelf()
+        	temporaryspeed = speed
+        	speed = 0
+        	counterStatus = false
+            
+		     BotonReanudar = widget.newButton
+		        {
+		            left = stage.width/2 - 75,
+      				top = stage.height/2 - 30,
+		            width = 150,
+		            height = 40,
+		            defaultFile = "images/B.Rean.png",
+		            overFile="images/B.ReanPressed.png",
+		            id = "Reanudar",
+		           	onEvent = BotonesPausa,
+		        }
+		     BotonMenu = widget.newButton
+		     {
+		            left = stage.width/2 - 75,
+       				top = stage.height/2 + 30,
+		            width = 150,
+		            height = 40,
+		            defaultFile = "images/B.Menu.png",
+		            overFile="images/B.MenuPressed.png",
+		            id = "Menu",
+		            onEvent =BotonesPausa,
+		 	 }
+
+        end
+    end
+end
+
+
 
 -- ------------------------------------------------------
 -- scrollElement()
@@ -77,10 +153,8 @@ local function onCollision(self, event)
                 counterStatus=false
                 speed=0
                 composer.gotoScene("gameOver",{effect="fade", time=500})
-                speed=2
-                contador=0
-                counterStatus = true
-                composer.removeScene( "play",true )
+                
+                --composer.removeScene( "play",true )
             end
         --end
     end
@@ -94,7 +168,7 @@ end
 function scene:create( event )
  
  -- esto es de composer pero la verdad no se que es :B
-    local sceneGroup = self.view
+    sceneGroup = self.view
 
     -- BACKGROUND
     bg = display.newImage("images/superficie.jpg")-- mostrar la imagen en pantalla
@@ -110,6 +184,7 @@ function scene:create( event )
             planet1.speed = speed -- atributo de plantet1 que determina la velocidad con la que se movera en pantalla
             planet1.type = "bg"
 
+
     planet2 = display.newImage("images/planet2.png")
             planet2.x = 320
             planet2.y = 90
@@ -117,10 +192,10 @@ function scene:create( event )
             planet2.type = "bg"
 
     planet1.enterFrame = scrollElement -- evento
-    Runtime:addEventListener("enterFrame", planet1)
+    --Runtime:addEventListener("enterFrame", planet1)
     sceneGroup:insert(planet1)
     planet2.enterFrame = scrollElement
-    Runtime:addEventListener("enterFrame", planet2)
+    --Runtime:addEventListener("enterFrame", planet2)
     sceneGroup:insert(planet2)
     -- ALIEN
     alien = display.newImage("images/alien.png")
@@ -132,7 +207,7 @@ function scene:create( event )
     -- al ser "static" es posible que gire en la pantalla
     physics.addBody(alien, "static", {shape=triangleShape, density=3, bounce = 0})
     alien.enterFrame = scrollElement
-    Runtime:addEventListener("enterFrame", alien)
+    --Runtime:addEventListener("enterFrame", alien)
     sceneGroup:insert(alien)
 
     -- PIEDRA
@@ -142,7 +217,7 @@ function scene:create( event )
             piedra.speed = 2.5
             piedra.type = "obstacle"
     piedra.enterFrame = scrollElement
-    Runtime:addEventListener("enterFrame", piedra)
+    --Runtime:addEventListener("enterFrame", piedra)
     sceneGroup:insert(piedra)
     -- PLAYER
     player = display.newImage("images/Personaje.png")
@@ -153,12 +228,12 @@ function scene:create( event )
     physics.addBody(player, "dynamic", {density=0.65, bounce = 0.2})
     player.isFixedRotation = true -- PARA QUE NO BAILE EL PERSONAJE
     player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
-    Runtime:addEventListener("touch", touchAction)
+    --Runtime:addEventListener("touch", touchAction)
     sceneGroup:insert(player)
 
     --  EN PROCESO----------------------------------------------
     player.collision = onCollision
-    Runtime:addEventListener("collision", player)
+    --Runtime:addEventListener("collision", player)
     -------------------------------------------------------
     -- FLOOR
     floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
@@ -167,7 +242,20 @@ function scene:create( event )
     physics.addBody(floor, "static", {bounce = 0})
     floor.y = stage.height - 10
 
-    currentTimeText = display.newText(contador, 400, 20, native.systemFontBold, 24) 
+     BotonPausa = widget.newButton
+        {
+            left = 400,
+            top = 20,
+            width = 50,
+            height = 50,
+            defaultFile = "images/B.Pause.png",
+            overFile="images/B.Pause.png",
+            id = "Pause",
+            onEvent = handleButtonEvent,
+        }
+    sceneGroup:insert(BotonPausa)
+
+    currentTimeText = display.newText(contador, 20, 20, native.systemFontBold, 24) 
     currentTimeText:setTextColor(1,1,1)
     sceneGroup:insert(currentTimeText)
 end
@@ -181,9 +269,35 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        speed=2
+        contador=0
+        counterStatus = true
+
+        alien.x = 500
+            alien.y = stage.height - alien.height/2 - 10
+            alien.speed = 2.5
+
+        piedra.x = 900
+            piedra.y = stage.height - piedra.height/2 - 15
+            piedra.speed = 2.5
+
+            player.x = 50
+          	player.y = 180
+
+        player:setLinearVelocity(0,800)
+		currentTimeText.text="Puntaje: "..0
  
     elseif ( phase == "did" ) then
-        -- Code here runs when the scene is entirely on screen
+        Runtime:addEventListener("enterFrame", planet1)
+        Runtime:addEventListener("enterFrame", planet2)
+        Runtime:addEventListener("enterFrame", alien)
+        Runtime:addEventListener("enterFrame", piedra)
+        Runtime:addEventListener("touch", touchAction)
+        Runtime:addEventListener("collision", player)
+
+        
+
+
     end
 end
  

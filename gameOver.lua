@@ -34,14 +34,14 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
     bg = display.newImage("images/Espacio.png")-- mostrar la imagen en pantalla
-            bg.x = 230 -- pos en x
-            bg.y = 160 -- pos en y
+           bg.x = 230 -- pos en x
+           bg.y = 160 -- pos en y
             
     sceneGroup:insert(bg) --agrega el elemento a la escena
             
     stars = display.newImage("images/Estrellas.png")-- mostrar la imagen en pantalla
-            stars.x = 150 -- pos en x
-            stars.y = 160 -- pos en y
+           stars.x = 150 -- pos en x
+           stars.y = 160 -- pos en y
     sceneGroup:insert(stars) --agrega el elemento a la escena
 
     again = widget.newButton
@@ -51,8 +51,8 @@ function scene:create( event )
         top = stage.height/2 - 40,
         width = 150,
         height = 40,
-        defaultFile = ("images/B.Play.png"),
-        overFile = ("images/B.PlayPressed.png"),
+        defaultFile = ("images/B.Reint.png"),
+        overFile = ("images/B.ReintPressed.png"),
         onEvent = againButtonEvent,
     }
     sceneGroup:insert(again)
@@ -63,8 +63,8 @@ function scene:create( event )
         top = stage.height/2 + 40,
         width = 150,
         height = 40,
-        defaultFile = ("images/B.Play.png"),
-        overFile = ("images/B.PlayPressed.png"),
+        defaultFile = ("images/B.Menu.png"),
+        overFile = ("images/B.MenuPressed.png"),
         onEvent = againButtonEvent,
     }
     sceneGroup:insert(main)
