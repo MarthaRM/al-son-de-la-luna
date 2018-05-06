@@ -33,7 +33,6 @@ physics.setPositionIterations(10)
  local BotonMenu
  local temporaryspeed
  local BotonPausa
- local sceneGroup
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -48,23 +47,11 @@ local function BotonesPausa(event)
 			BotonMenu:removeSelf()
 			speed = temporaryspeed
         	counterStatus = true
-        	BotonPausa = widget.newButton
-        {
-            left = 400,
-            top = 20,
-            width = 50,
-            height = 50,
-            defaultFile = "images/B.Pause.png",
-            overFile="images/B.Pause.png",
-            id = "Pause",
-            onEvent = handleButtonEvent,
-        }
-    	sceneGroup:insert(BotonPausa)
+        	BotonPausa:setEnabled("true")
 		elseif id =="Menu" then
 			BotonReanudar:removeSelf()
 			BotonMenu:removeSelf()
 			composer.gotoScene("menu",{effect="fade",time=500})
-
 
 		end
 	end
@@ -75,7 +62,7 @@ local function handleButtonEvent(event)
     local id = event.target.id
     if "ended" == phase then
         if id == "Pause" then
-        	BotonPausa:removeSelf()
+        	BotonPausa:setEnabled("false")
         	temporaryspeed = speed
         	speed = 0
         	counterStatus = false
@@ -168,7 +155,7 @@ end
 function scene:create( event )
  
  -- esto es de composer pero la verdad no se que es :B
-    sceneGroup = self.view
+    local sceneGroup = self.view
 
     -- BACKGROUND
     bg = display.newImage("images/superficie.jpg")-- mostrar la imagen en pantalla
