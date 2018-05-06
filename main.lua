@@ -5,4 +5,4 @@
 -----------------------------------------------------------------------------------------
 
 local composer = require("composer")
-composer.gotoScene("gameOver", {effect = "fade", time = 500})
+composer.gotoScene("menu", {effect = "fade", time = 500})
