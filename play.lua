@@ -287,9 +287,27 @@ function scene:create( event )
     planet8.enterFrame = scrollElement
     sceneGroup:insert(planet8) 
 
-
     -- ALIEN
-    alien = display.newImage("images/alien.png")
+    -- Sprite Alien
+    sequenceData = 
+    {
+        name="alien",
+        start=1,
+        count=6,
+    --    count=6,
+        time=500,
+        loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+        loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
+    }
+    local options = {
+        --required parameters
+        width = 59,
+        height = 52,
+        numFrames = 6
+    }
+    local alienSprite = graphics.newImageSheet( "images/alienSprite.png", options )
+    
+    alien = display.newSprite(alienSprite, sequenceData)     
             alien.x = 800
             alien.y = stage.height - alien.height/2 - 150
             alien.speed = 2.5
@@ -300,6 +318,8 @@ function scene:create( event )
     alien.enterFrame = scrollElement
     --Runtime:addEventListener("enterFrame", alien)
     sceneGroup:insert(alien)
+    -- inicia el sprite
+    alien:play()
 
     -- PIEDRA
     piedra = display.newImage("images/piedra.png")
@@ -310,17 +330,36 @@ function scene:create( event )
     piedra.enterFrame = scrollElement
     --Runtime:addEventListener("enterFrame", piedra)
     sceneGroup:insert(piedra)
+    
     -- PLAYER
-    player = display.newImage("images/Personaje.png")
+    sequenceData = 
+    {
+        name="player",
+        start=1,
+        count=4,
+    --    count=6,
+        time=500,
+        loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+        loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
+    }
+    options = {
+        --required parameters
+        width = 81,
+        height = 120.5,
+        numFrames = 4
+    }
+    playerSprite = graphics.newImageSheet( "images/PlayerWalk.png", options )
+    player = display.newSprite(playerSprite, sequenceData)   
             player.x = 50
             player.y = 180
 
     -- agrega elemento a physics
-    physics.addBody(player, "dynamic", {density=0.65, bounce = 0.2})
+    physics.addBody(player, "dynamic", {density=0.95, bounce = 0.2})
     player.isFixedRotation = true -- PARA QUE NO BAILE EL PERSONAJE
     player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
     --Runtime:addEventListener("touch", touchAction)
     sceneGroup:insert(player)
+    player:play()
 
     --  EN PROCESO----------------------------------------------
     player.collision = onCollision
