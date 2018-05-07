@@ -64,8 +64,8 @@ local function BotonesPausa(event)
         	physics.start()
             --reanuda sprite jugador
             player:play()
-            -- reanuda sprite alien
-            alien:play()
+            -- reanuda sprite obstaculo
+            obstaculo:play()
 		elseif id =="Menu" then
 			BotonReanudar:removeSelf()
 			BotonMenu:removeSelf()
@@ -86,7 +86,6 @@ local function handleButtonEvent(event)
     if "ended" == phase then
         if id == "Pause" then
         	print("wtf")
-        	--physics.addBody(player, "static", {density=0.65, bounce = 0.2})
         	BotonPausa:setEnabled(false)
         	temporaryspeed = speed
         	speed = 0
@@ -95,11 +94,8 @@ local function handleButtonEvent(event)
         	physics.pause()
             --detiene sprite jugador
             player:pause()
-            -- detiene sprite alien
-            alien:pause()
-
-            --player.x = player.x
-            --player.y = player.y
+            -- detiene sprite obstaculo
+            obstaculo:pause()
             pauseStatus  = true
 		     BotonReanudar = widget.newButton
 		        {
@@ -145,6 +141,38 @@ local function scrollElement(self, event)
     end
 end
 
+-- ------------------------------------------------------
+-- scrollElement()
+-- 
+-- Hace "girar" los obstaculos o enemigos del personaje
+-- de forma aleatoria
+-- 
+-- ------------------------------------------------------
+local function scrollObstacle(self, event)
+
+    self.speed=speed
+    if self.x < (display.contentWidth-self.width)*(-1) then
+        self.x = display.contentWidth+self.width + math.random(5,20)
+        -- nombres de secuencias
+        local ops =
+        {
+          [1] = 'alien',
+          [2] = 'gallina',
+        }
+        -- agrega una secuencia aleatoria
+        self:setSequence(ops[math.random(1, 2)])
+        -- inicia nueva secuecia
+        self:play()
+    else
+        self.x = self.x - self.speed
+    end
+end
+
+-- ------------------------------------------------------
+-- scrollElementPiso()
+-- 
+-- Hace "girar" el suelo del juego
+-- ------------------------------------------------------
 local function scrollElementPiso(self, event)
     self.speed=speed
     -- if self.x < (display.contentWidth/2)*(-1) then
@@ -180,7 +208,8 @@ local function touchAction( event )
 		        player:applyLinearImpulse( nil, 800, player.x, player.y )
 		        print("salta")
                 --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
-                player:setSequence("jumping")
+                player:setFrame(2)
+                player:pause()
 
 		    end
 		    playerStatus = true
@@ -222,44 +251,29 @@ end
 -- ------------------------------------------------------
 -- makeSprite()
 --
--- Crea un nuevo sprite con una sola secuencia si la
--- variable moreOptions es nil
---
--- si moreOprions no es nil, entonces crea un sprite
--- con las secuencias perzonalizadas en caso de que se
--- opciones diferentes o mas de una secuencia
+-- Crea un nuevo sprite con una sola secuencia
 -- ------------------------------------------------------
-local function makeSprite(name, time, w, h, frames, file, moreOptions)
+local function makeSprite(name, time, w, h, frames, file)
+    local options = {
+        width = w,
+        height = h,
+        numFrames = frames
+    }
+
     
-    if moreOptions ~= nil then
-        local options = {
-            --required parameters
-            width = w,
-            height = h,
-            numFrames = frames
-        }
-        local sprite =  graphics.newImageSheet( file, options )
-        return display.newSprite(sprite, moreOptions) 
-    else
-        sequenceData = 
-        {
-            name=name,
-            start=1,
-            count=frames,
-        --    count=6,
-            time=time,
-            loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
-            loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
-        }
-        local options = {
-            --required parameters
-            width = w,
-            height = h,
-            numFrames = frames
-        }
-        local sprite =  graphics.newImageSheet( file, options )
-        return display.newSprite(sprite, sequenceData) 
-    end
+    sequenceData = 
+    {
+        name=name,
+        start=1,
+        count=frames,
+    --    count=6,
+        time=time,
+        loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+        loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
+    }
+    
+    local sprite =  graphics.newImageSheet( file, options )
+    return display.newSprite(sprite, sequenceData) 
 end
 -- ------------------------------------------------------
 -- create()
@@ -346,33 +360,51 @@ function scene:create( event )
     planet8.enterFrame = scrollElement
     sceneGroup:insert(planet8) 
 
-    -- ALIEN
-    alien = makeSprite("alien", 500, 59, 52, 6, "images/alienSprite.png")--sprite
-            alien.x = 800
-            alien.y = stage.height - alien.height/2 - 150
-            alien.speed = 2.5
-            alien.type = "obstacle"
+    -- OBSTACULOS
+    -- Para los obstaculos, se crea una ImageSeet para cada sprite
+    -- Despues se crea una variable SecuenceData que almacena los datos de cada ImageSheet de cada
+    -- obstaculo para crear un sprite que contenga cada animacion y solo cambiar la imageSheet de forma aleatoria
+    -- sin la necesidad de crear nuevos objetos
+    
+    -- AlienaImage Sheet
+    local sheetData = { width=59, height=52, numFrames=6 }
+    local alienSprite = graphics.newImageSheet( "images/alienSprite.png", sheetData )
+     
+    -- Gallina image sheet
+    sheetData = { width=42, height=64, numFrames=3}
+    local gallinaSprite = graphics.newImageSheet( "images/Gallina.png", sheetData )
+     
+    -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
+    local sequenceData = {
+        { name="alien", sheet=alienSprite, start=1, count=6, time=500, loopCount=0 , loopDirection = "forward"},
+        { name="gallina", sheet=gallinaSprite, start=1, count=3, time=500, loopCount=0 , loopDirection = "forward"}
+    }
+   
+    obstaculo = display.newSprite(alienSprite, sequenceData)
+            obstaculo.x = 800
+            obstaculo.y = stage.height - obstaculo.height/2 - 150
+            obstaculo.speed = 2.5
+            obstaculo.type = "obstacle"
     
     -- al ser "static" es posible que gire en la pantalla
-    physics.addBody(alien, "static", {shape=triangleShape, density=3, bounce = 0})
-    alien.enterFrame = scrollElement
-    --Runtime:addEventListener("enterFrame", alien)
-    sceneGroup:insert(alien)
+    physics.addBody(obstaculo, "static", {shape=triangleShape, density=3, bounce = 0})
+    obstaculo.enterFrame = scrollObstacle
+    sceneGroup:insert(obstaculo)
     -- inicia el sprite
-    alien:play()
+    obstaculo:setSequence("alien")
+    obstaculo:play()
 
-    -- PIEDRA
+    --[[ PIEDRA
     piedra = display.newImage("images/piedra.png")
             piedra.x = 900
             piedra.y = 100
             piedra.speed = 2.5
             piedra.type = "obstacle"
-    piedra.enterFrame = scrollElement
-    --Runtime:addEventListener("enterFrame", piedra)
-    sceneGroup:insert(piedra)
+    piedra.enterFrame = scrollObstacle
+    sceneGroup:insert(piedra)]]
     
     -- PLAYER
-    player = makeSprite("player", 500, 81, 120.5, 4, "images/PlayerWalk.png", {{ name="walking", start=1, count=4, time=500, loopCount=0, loopDirection = "forward" },{ name="jumping", frames={ 2,3 }, time=500, loopCount=0,  loopDirection = "forward" }})--sprite
+    player = makeSprite("player", 500, 81, 120.5, 4, "images/PlayerWalk.png")--sprite
             player.x = 50
             player.y = 180
 
@@ -380,15 +412,11 @@ function scene:create( event )
     physics.addBody(player, "dynamic", {density=0.95, bounce = 0.2})
     player.isFixedRotation = true -- PARA QUE NO BAILE EL PERSONAJE
     player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
-    --Runtime:addEventListener("touch", touchAction)
     sceneGroup:insert(player)
     player:setSequence("walking")
     player:play()
-
-    --  EN PROCESO----------------------------------------------
     player.collision = onCollision
-    --Runtime:addEventListener("collision", player)
-    -------------------------------------------------------
+
     -- FLOOR
     floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
     floor.type = "SUELO"
@@ -445,13 +473,13 @@ function scene:show( event )
         contador=0
         counterStatus = true
 
-        alien.x = 500
-            alien.y = stage.height - alien.height/2 - 27
-            alien.speed = 2.5
+        obstaculo.x = 500
+            obstaculo.y = stage.height - obstaculo.height/2 - 27
+            obstaculo.speed = 2.5
 
-        piedra.x = 900
+        --[[piedra.x = 900
             piedra.y = stage.height - piedra.height/2 - 27
-            piedra.speed = 2.5
+            piedra.speed = 2.5]]
 
             player.x = 50
           	player.y = 180
@@ -476,8 +504,8 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", planet4)
         Runtime:addEventListener("enterFrame", planet5)
         Runtime:addEventListener("enterFrame", planet6)
-        Runtime:addEventListener("enterFrame", alien)
-        Runtime:addEventListener("enterFrame", piedra)
+        Runtime:addEventListener("enterFrame", obstaculo)
+        --Runtime:addEventListener("enterFrame", piedra)
         Runtime:addEventListener("enterFrame", piso1)
         Runtime:addEventListener("enterFrame", piso2)
         Runtime:addEventListener("touch", touchAction)
