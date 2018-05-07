@@ -62,6 +62,10 @@ local function BotonesPausa(event)
         	playerStatus=false
         	print("start reanudar ",playerStatus)
         	physics.start()
+            --reanuda sprite jugador
+            player:play()
+            -- reanuda sprite alien
+            alien:play()
 		elseif id =="Menu" then
 			BotonReanudar:removeSelf()
 			BotonMenu:removeSelf()
@@ -89,6 +93,11 @@ local function handleButtonEvent(event)
         	counterStatus = false
         	print("pause pausa",playerStatus)
         	physics.pause()
+            --detiene sprite jugador
+            player:pause()
+            -- detiene sprite alien
+            alien:pause()
+
             --player.x = player.x
             --player.y = player.y
             pauseStatus  = true
