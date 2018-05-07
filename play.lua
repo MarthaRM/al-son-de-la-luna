@@ -7,7 +7,7 @@ local widget = require ("widget")
 local physics = require ("physics")
 -- stage = tamaño pantalla
 _G.stage = display.getCurrentStage()
-physics.setDrawMode("normal")
+physics.setDrawMode("hybrid")
 physics.start() 
 physics.setGravity(0, 40)
 physics.setPositionIterations(10)
@@ -158,11 +158,13 @@ local function scrollObstacle(self, event)
         {
           [1] = 'alien',
           [2] = 'gallina',
+          [3] = "robot"
         }
         -- agrega una secuencia aleatoria
-        self:setSequence(ops[math.random(1, 2)])
+        self:setSequence(ops[math.random(1, 3)])
         -- inicia nueva secuecia
         self:play()
+        self.y = stage.height - self.height/2 - 27
     else
         self.x = self.x - self.speed
     end
@@ -373,11 +375,16 @@ function scene:create( event )
     -- Gallina image sheet
     sheetData = { width=42, height=64, numFrames=3}
     local gallinaSprite = graphics.newImageSheet( "images/Gallina.png", sheetData )
+
+    -- Robot image sheet
+    sheetData = { width=62.5, height=112, numFrames=3}
+    local robotSprite = graphics.newImageSheet( "images/robotSprite.png", sheetData )
      
     -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
     local sequenceData = {
         { name="alien", sheet=alienSprite, start=1, count=6, time=500, loopCount=0 , loopDirection = "forward"},
-        { name="gallina", sheet=gallinaSprite, start=1, count=3, time=500, loopCount=0 , loopDirection = "forward"}
+        { name="gallina", sheet=gallinaSprite, start=1, count=3, time=500, loopCount=0 , loopDirection = "forward"},
+        { name="robot", sheet=robotSprite, start=1, count=3, time=500, loopCount=0 , loopDirection = "forward"}
     }
    
     obstaculo = display.newSprite(alienSprite, sequenceData)
