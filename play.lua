@@ -179,9 +179,11 @@ local function touchAction( event )
 
 		        player:applyLinearImpulse( nil, 800, player.x, player.y )
 		        print("salta")
+                --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
+                player:setSequence("jumping")
+
 		    end
 		    playerStatus = true
-		   	
 
 		end
 	end
@@ -190,8 +192,8 @@ end
 
 -- ------------------------------------------------------
 -- onCollision()
---
--- En proceso ...
+-- 
+-- Detecta colisiones entre obstaculos y personaje
 -- ------------------------------------------------------
 local function onCollision(self, event)
 
@@ -207,12 +209,58 @@ local function onCollision(self, event)
             	
             	playerStatus = false
             	print(player.y)
+                --cambia secuancia de jugador para que aparen caminar
+                player:setSequence("walking")
+                --incia sprite nuevamente, al cambiar de secuencia el sprite se detiene
+                player:play()
 
             end
         --end
     end
 end
 
+-- ------------------------------------------------------
+-- makeSprite()
+--
+-- Crea un nuevo sprite con una sola secuencia si la
+-- variable moreOptions es nil
+--
+-- si moreOprions no es nil, entonces crea un sprite
+-- con las secuencias perzonalizadas en caso de que se
+-- opciones diferentes o mas de una secuencia
+-- ------------------------------------------------------
+local function makeSprite(name, time, w, h, frames, file, moreOptions)
+    
+    if moreOptions ~= nil then
+        local options = {
+            --required parameters
+            width = w,
+            height = h,
+            numFrames = frames
+        }
+        local sprite =  graphics.newImageSheet( file, options )
+        return display.newSprite(sprite, moreOptions) 
+    else
+        sequenceData = 
+        {
+            name=name,
+            start=1,
+            count=frames,
+        --    count=6,
+            time=time,
+            loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+            loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
+        }
+        local options = {
+            --required parameters
+            width = w,
+            height = h,
+            numFrames = frames
+        }
+        local sprite =  graphics.newImageSheet( file, options )
+        return display.newSprite(sprite, sequenceData) 
+    end
+end
 -- ------------------------------------------------------
 -- create()
 -- Crea una nueva escena inicializando sus elementos
@@ -299,26 +347,7 @@ function scene:create( event )
     sceneGroup:insert(planet8) 
 
     -- ALIEN
-    -- Sprite Alien
-    sequenceData = 
-    {
-        name="alien",
-        start=1,
-        count=6,
-    --    count=6,
-        time=500,
-        loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
-        loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
-    }
-    local options = {
-        --required parameters
-        width = 59,
-        height = 52,
-        numFrames = 6
-    }
-    local alienSprite = graphics.newImageSheet( "images/alienSprite.png", options )
-    
-    alien = display.newSprite(alienSprite, sequenceData)     
+    alien = makeSprite("alien", 500, 59, 52, 6, "images/alienSprite.png")--sprite
             alien.x = 800
             alien.y = stage.height - alien.height/2 - 150
             alien.speed = 2.5
@@ -343,24 +372,7 @@ function scene:create( event )
     sceneGroup:insert(piedra)
     
     -- PLAYER
-    sequenceData = 
-    {
-        name="player",
-        start=1,
-        count=4,
-    --    count=6,
-        time=500,
-        loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
-        loopDirection = "forward"    -- Optional ; values include "forward" or "bounce"
-    }
-    options = {
-        --required parameters
-        width = 81,
-        height = 120.5,
-        numFrames = 4
-    }
-    playerSprite = graphics.newImageSheet( "images/PlayerWalk.png", options )
-    player = display.newSprite(playerSprite, sequenceData)   
+    player = makeSprite("player", 500, 81, 120.5, 4, "images/PlayerWalk.png", {{ name="walking", start=1, count=4, time=500, loopCount=0, loopDirection = "forward" },{ name="jumping", frames={ 2,3 }, time=500, loopCount=0,  loopDirection = "forward" }})--sprite
             player.x = 50
             player.y = 180
 
@@ -370,6 +382,7 @@ function scene:create( event )
     player.isSleepingAllowed = false -- PARA QUE NO SE "DUERMA"
     --Runtime:addEventListener("touch", touchAction)
     sceneGroup:insert(player)
+    player:setSequence("walking")
     player:play()
 
     --  EN PROCESO----------------------------------------------
