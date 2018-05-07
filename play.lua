@@ -138,8 +138,10 @@ end
 
 local function scrollElementPiso(self, event)
     self.speed=speed
-    if self.x < (display.contentWidth/2)*(-1) then
-        self.x = display.contentWidth+self.width
+    -- if self.x < (display.contentWidth/2)*(-1) then
+    if self.x < self.width / 2 *(-1) - 50 then
+        --self.x = display.contentWidth+self.width
+        self.x = display.contentCenterX + self.width - 20
         --self.y = stage.height - alien.height/2 - math.random(5,20)
     else
         self.x = self.x - self.speed
@@ -378,9 +380,10 @@ function scene:create( event )
     sceneGroup:insert(piso1)
     piso1.enterFrame = scrollElementPiso
     piso1.speed = 2.5
+
     piso2 = display.newImage("images/Piso.png")
     piso2.y = stage.height - 14
-    piso2.x = 800
+    piso2.x = display.contentCenterX + piso2.width
     sceneGroup:insert(piso2)
     piso2.enterFrame = scrollElementPiso
     piso2.speed = 2.5
