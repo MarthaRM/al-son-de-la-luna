@@ -11,6 +11,8 @@ screenHeight = display.contentHeight - screenTop * 2
 screenBottom = screenTop + screenHeight 
 display.contentWidht = screendWidth
 display.contentHeight = screenHeight
+local backgroundMusic
+
  
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
@@ -84,6 +86,8 @@ function scene:create( event )
     --BotonJugar:addEventListener("tap",changeScenes)
     --BotonCred:addEventListener("tap",changeScenes)
 
+    ---- MUSICA -----
+
  
 end
  
@@ -99,7 +103,9 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
- 
+        backgroundMusic = audio.loadStream( "music/menu.wav" )
+        audio.setVolume( 0.50 )
+        audio.play( backgroundMusic )
     end
 end
  
@@ -112,6 +118,9 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
+        audio.fadeOut( { channel=1, time=500 } )
+        audio.stop()
+        audio.rewind( backgroundMusic )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
