@@ -44,6 +44,7 @@ display.contentHeight = screenHeight
  local BotonPausa
  local pauseStatus =false
  local playerStatus = false
+ local backgroundMusic
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -521,10 +522,10 @@ function scene:show( event )
       	playerStatus=false
       	print("start did phase ", playerStatus)
       	physics.start()
-
-
-        
-
+        ----MUSICA---
+        backgroundMusic = audio.loadStream( "music/play.wav" )
+        audio.setVolume( 0.50 )
+        audio.play( backgroundMusic, { loops=-1, fadein=1700 })
 
     end
 end
@@ -539,11 +540,13 @@ function scene:hide( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
  		BotonPausa:setEnabled()
+        ----MUSICA----
+        audio.fadeOut( { time=500 } )
+        audio.stop()
+        audio.rewind( backgroundMusic )
  		
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-
- 
     end
 end
  
@@ -559,7 +562,7 @@ end
 
 -- Contador
 local function timerUp()
-    if speed<5 then
+    if speed<25 then
         speed = speed*1.04
     end
     if counterStatus == true then
@@ -569,6 +572,7 @@ local function timerUp()
 end
 
 timerUpTimer = timer.performWithDelay(1000, timerUp, 0)
+
  
  
 -- -----------------------------------------------------------------------------------

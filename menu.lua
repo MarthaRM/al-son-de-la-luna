@@ -86,9 +86,6 @@ function scene:create( event )
     --BotonJugar:addEventListener("tap",changeScenes)
     --BotonCred:addEventListener("tap",changeScenes)
 
-    ---- MUSICA -----
-
- 
 end
  
  
@@ -103,9 +100,10 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+        ----MUSICA---
         backgroundMusic = audio.loadStream( "music/menu.wav" )
         audio.setVolume( 0.50 )
-        audio.play( backgroundMusic )
+        audio.play( backgroundMusic, { loops=-1, fadein=3200 })
     end
 end
  
@@ -118,7 +116,8 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        audio.fadeOut( { channel=1, time=500 } )
+        ----MUSICA----
+        audio.fadeOut( { time=500 } )
         audio.stop()
         audio.rewind( backgroundMusic )
  
