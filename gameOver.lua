@@ -11,7 +11,7 @@ local scene = composer.newScene()
  local main
  local bg
  local etrellas --ETRELLAS? LOL
- local backgroundMusic
+ local gameOverMusic 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -84,9 +84,9 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         ----MUSICA---
-        backgroundMusic = audio.loadStream( "music/gameover.wav" )
-        audio.setVolume( 0.50 )
-        audio.play( backgroundMusic, { loops=-1, fadein=100 })
+        print("GAMEOVER")
+        gameOverMusic = audio.loadStream( "music/gameover.wav" )
+        audio.play( gameOverMusic, { channel=3, loops=-1, fadein=100 })
  
     end
 end
@@ -101,13 +101,13 @@ function scene:hide( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
         ----MUSICA----
-        audio.fadeOut( { time=500 } )
-        audio.stop()
-        audio.rewind( backgroundMusic )
+        audio.fadeOut( { channel=3, time=1500 } )
+        audio.stop(3)
+        audio.rewind({channel=3})
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
- 
+        composer.removeScene( "gameOver", true )
     end
 end
  

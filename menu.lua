@@ -11,7 +11,7 @@ screenHeight = display.contentHeight - screenTop * 2
 screenBottom = screenTop + screenHeight 
 display.contentWidht = screendWidth
 display.contentHeight = screenHeight
-local backgroundMusic
+local menuMusic
 
  
 -- -----------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ local backgroundMusic
 -- function changeScenes(){
 --
  --}
+
 local function handleButtonEvent (event)
     local phase = event.phase
     local id = event.target.id
@@ -101,9 +102,8 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         ----MUSICA---
-        backgroundMusic = audio.loadStream( "music/menu.wav" )
-        audio.setVolume( 0.50 )
-        audio.play( backgroundMusic, { loops=-1, fadein=3200 })
+        menuMusic = audio.loadStream( "music/menu.wav" )
+        audio.play( menuMusic, { channel=1, loops=-1, fadein=3200 })
     end
 end
  
@@ -116,14 +116,12 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        ----MUSICA----
-        audio.fadeOut( { time=500 } )
-        audio.stop()
-        audio.rewind( backgroundMusic )
+        audio.fadeOut( { channel=1, time=1000 } )
+        audio.stop(1)
+        audio.rewind({channel=1})
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
- 
     end
 end
  

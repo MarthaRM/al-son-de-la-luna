@@ -44,7 +44,7 @@ display.contentHeight = screenHeight
  local BotonPausa
  local pauseStatus =false
  local playerStatus = false
- local backgroundMusic
+ local playMusic
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -231,9 +231,16 @@ local function onCollision(self, event)
 
     if event.phase == "began" then
         ---if event.object2.type == "obstacle" then
+        if event.object2 ~= nil then 
+            print(event.object2.type)
+        end
+        if event.object1 ~= nil then 
+            print(event.object1.type)
+        end
             if event.object2.type ~= "SUELO" then
                 counterStatus=false
                 speed=0
+                physics.pause()
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
                 --composer.removeScene( "play",true )
@@ -250,7 +257,6 @@ local function onCollision(self, event)
         --end
     end
 end
-
 -- ------------------------------------------------------
 -- makeSprite()
 --
@@ -424,6 +430,7 @@ function scene:create( event )
     player:setSequence("walking")
     player:play()
     player.collision = onCollision
+    player.type="player"
 
     -- FLOOR
     floor = display.newRect(stage.width/2, 0, stage.width*2, 0)
@@ -522,10 +529,10 @@ function scene:show( event )
       	playerStatus=false
       	print("start did phase ", playerStatus)
       	physics.start()
+
         ----MUSICA---
-        backgroundMusic = audio.loadStream( "music/play.wav" )
-        audio.setVolume( 0.50 )
-        audio.play( backgroundMusic, { loops=-1, fadein=1700 })
+        playMusic = audio.loadStream( "music/play.wav" )
+        audio.play( playMusic, { channel=2, loops=-1, fadein=3200 })
 
     end
 end
@@ -541,9 +548,9 @@ function scene:hide( event )
         -- Code here runs when the scene is on screen (but is about to go off screen)
  		BotonPausa:setEnabled()
         ----MUSICA----
-        audio.fadeOut( { time=500 } )
-        audio.stop()
-        audio.rewind( backgroundMusic )
+        audio.fadeOut( { channel=2, time=1500 } )
+        audio.stop(2)
+        audio.rewind({channel=2})
  		
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
@@ -563,7 +570,7 @@ end
 -- Contador
 local function timerUp()
     if speed<25 then
-        speed = speed*1.04
+        speed = speed*1.03
     end
     if counterStatus == true then
         contador = contador + 1
