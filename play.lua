@@ -30,6 +30,7 @@ display.contentHeight = screenHeight
  local planet1
  local planet2
  local player
+ local obstaculo
  local floor
  local alien
  local contador = 0
@@ -41,6 +42,7 @@ display.contentHeight = screenHeight
  local BotonReanudar
  local BotonMenu
  local temporaryspeed
+ local speedTemporal=3
  local BotonPausa
  local pauseStatus =false
  local playerStatus = false
@@ -98,28 +100,28 @@ local function handleButtonEvent(event)
             -- detiene sprite obstaculo
             obstaculo:pause()
             pauseStatus  = true
-		     BotonReanudar = widget.newButton
-		        {
-		            left = stage.width/2 - 75,
-      				top = stage.height/2 - 30,
-		            width = 150,
-		            height = 40,
-		            defaultFile = "images/B.Rean.png",
-		            overFile="images/B.ReanPressed.png",
-		            id = "Reanudar",
-		           	onEvent = BotonesPausa,
-		        }
-		     BotonMenu = widget.newButton
-		     {
-		            left = stage.width/2 - 75,
-       				top = stage.height/2 + 30,
-		            width = 150,
-		            height = 40,
-		            defaultFile = "images/B.Menu.png",
-		            overFile="images/B.MenuPressed.png",
-		            id = "Menu",
-		            onEvent =BotonesPausa,
-		 	 }
+		    BotonReanudar = widget.newButton
+		    {
+		        left = stage.width/2 - 75,
+      			top = stage.height/2 - 30,
+		        width = 150,
+		        height = 40,
+		        defaultFile = "images/B.Rean.png",
+		        overFile="images/B.ReanPressed.png",
+		        id = "Reanudar",
+		      	onEvent = BotonesPausa,
+		    }
+		    BotonMenu = widget.newButton
+		    {
+		        left = stage.width/2 - 75,
+       			top = stage.height/2 + 30,
+		        width = 150,
+		        height = 40,
+		        defaultFile = "images/B.Menu.png",
+		        overFile="images/B.MenuPressed.png",
+		        id = "Menu",
+		        onEvent =BotonesPausa,
+		 	}
 
         end
     end
@@ -151,11 +153,9 @@ end
 -- ------------------------------------------------------
 local function scrollObstacle(self, event)
 
-    
     if self.x < (display.contentWidth-self.width)*(-1) then
         
         ------- AJUSTE DE NIVEL DEL OBSTACULO -------
-
         if speed<5 then
             self.speed=math.random(speed+1,speed+5)
         elseif speed<10 then
@@ -168,7 +168,7 @@ local function scrollObstacle(self, event)
             self.speed=math.random(speed+5,speed+13)
         end
         ---------------------------------------------
-        
+        speedTemporal=self.speed
         self.x = display.contentWidth+self.width + math.random(5,20)
         -- nombres de secuencias
         local ops =
@@ -183,7 +183,14 @@ local function scrollObstacle(self, event)
         self:play()
         self.y = stage.height - self.height/2 - 27
     else
+        if pauseStatus==true then
+            speedTemporal = self.speed
+            self.speed=0
+        else
+            self.speed=speedTemporal
+        end
         self.x = self.x - self.speed
+        self.speed = speedTemporal
     end
 end
 
@@ -211,13 +218,19 @@ end
 -- para hacerlo brincar
 -- ------------------------------------------------------
 local function touchAction( event )
+
 	local phase = event.phase
+
 	print("pausestatus",pauseStatus)
+
 	if pauseStatus  == false then
+
 		print("playerstatus",playerStatus)
-		if player.y >= 219 then
+		if player.y >= 220 then
+
 			print(event.phase)
 			print(phase)
+
 		    if phase == "began"  then
 		        -- velocidad en x = 0
 		        -- velocidad en y = 800
@@ -229,13 +242,13 @@ local function touchAction( event )
                 --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
                 player:setFrame(2)
                 player:pause()
+                playerStatus = true
 
 		    end
-		    playerStatus = true
 
 		end
 	end
-
+    print(player.y)
 end
 
 -- ------------------------------------------------------
@@ -247,12 +260,6 @@ local function onCollision(self, event)
 
     if event.phase == "began" then
         ---if event.object2.type == "obstacle" then
-        if event.object2 ~= nil then 
-            print(event.object2.type)
-        end
-        if event.object1 ~= nil then 
-            print(event.object1.type)
-        end
             if event.object2.type ~= "SUELO" then
                 counterStatus=false
                 speed=0
@@ -263,7 +270,7 @@ local function onCollision(self, event)
             else--if event.object2.type == "SUELO" then
             	
             	playerStatus = false
-            	print(player.y)
+            	--print(player.y)
                 --cambia secuancia de jugador para que aparen caminar
                 player:setSequence("walking")
                 --incia sprite nuevamente, al cambiar de secuencia el sprite se detiene
@@ -505,18 +512,18 @@ function scene:show( event )
         counterStatus = true
 
         obstaculo.x = 500
-            obstaculo.y = stage.height - obstaculo.height/2 - 27
-            obstaculo.speed = 2.5
+        obstaculo.y = stage.height - obstaculo.height/2 - 27
+        obstaculo.speed = 2.5
 
         --[[piedra.x = 900
             piedra.y = stage.height - piedra.height/2 - 27
             piedra.speed = 2.5]]
 
-            player.x = 50
-          	player.y = 180
+        player.x = 50
+        player.y = 180
 
-         pauseStatus  = false
-		 BotonPausa:setEnabled(true)
+        pauseStatus  = false
+		BotonPausa:setEnabled(true)
 
 
 		 
@@ -585,7 +592,7 @@ end
 
 -- Contador
 local function timerUp()
-    if speed<25 then
+    if speed<25 and pauseStatus~=true then
         speed = speed*1.03
     end
     if counterStatus == true then
