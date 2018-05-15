@@ -151,8 +151,24 @@ end
 -- ------------------------------------------------------
 local function scrollObstacle(self, event)
 
-    self.speed=speed
+    
     if self.x < (display.contentWidth-self.width)*(-1) then
+        
+        ------- AJUSTE DE NIVEL DEL OBSTACULO -------
+
+        if speed<5 then
+            self.speed=math.random(speed+1,speed+5)
+        elseif speed<10 then
+            self.speed=math.random(speed+2,speed+7)
+        elseif speed<15 then
+            self.speed=math.random(speed+3,speed+9)
+        elseif speed<20 then
+            self.speed=math.random(speed+4,speed+11)
+        else
+            self.speed=math.random(speed+5,speed+13)
+        end
+        ---------------------------------------------
+        
         self.x = display.contentWidth+self.width + math.random(5,20)
         -- nombres de secuencias
         local ops =
@@ -207,8 +223,8 @@ local function touchAction( event )
 		        -- velocidad en y = 800
 		       
 		        player:setLinearVelocity(0,800)
-
-		        player:applyLinearImpulse( nil, 800, player.x, player.y )
+		        player:applyLinearImpulse( nil, 850, player.x, player.y )
+                player.gravityScale=(1+(speed/12))
 		        print("salta")
                 --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
                 player:setFrame(2)
