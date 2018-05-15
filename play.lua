@@ -7,7 +7,7 @@ local widget = require ("widget")
 local physics = require ("physics")
 -- stage = tamaño pantalla
 _G.stage = display.getCurrentStage()
-physics.setDrawMode("hybrid")
+physics.setDrawMode("normal")
 physics.start() 
 physics.setGravity(0, 40)
 physics.setPositionIterations(10)
@@ -42,7 +42,7 @@ display.contentHeight = screenHeight
  local BotonReanudar
  local BotonMenu
  local temporaryspeed
- local speedTemporal=3
+ local speedTemporal
  local BotonPausa
  local pauseStatus =false
  local playerStatus = false
@@ -221,15 +221,15 @@ local function touchAction( event )
 
 	local phase = event.phase
 
-	print("pausestatus",pauseStatus)
+	--print("pausestatus",pauseStatus)
 
 	if pauseStatus  == false then
 
-		print("playerstatus",playerStatus)
+		--print("playerstatus",playerStatus)
 		if player.y >= 220 then
 
-			print(event.phase)
-			print(phase)
+			--print(event.phase)
+			--print(phase)
 
 		    if phase == "began"  then
 		        -- velocidad en x = 0
@@ -237,8 +237,13 @@ local function touchAction( event )
 		       
 		        player:setLinearVelocity(0,800)
 		        player:applyLinearImpulse( nil, 850, player.x, player.y )
-                player.gravityScale=(1+(speed/12))
+                if player.gravityScale < 1.48 then
+                    player.gravityScale=(1+(speed/18))
+                else
+                    player.gravityScale=1.5
+                end
 		        print("salta")
+
                 --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
                 player:setFrame(2)
                 player:pause()
@@ -248,7 +253,6 @@ local function touchAction( event )
 
 		end
 	end
-    print(player.y)
 end
 
 -- ------------------------------------------------------
@@ -266,7 +270,36 @@ local function onCollision(self, event)
                 physics.pause()
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
-                --composer.removeScene( "play",true )
+                ---------------------------- GUARDAR PUNTAJE ----------------------------
+                local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
+                local bestScore
+                -- Open the file handle
+                local file = io.open( path, "a+" )
+
+                for line in file:lines() do
+                    if line~=nil then
+                        bestScore=line
+                    else
+                        bestScore="0"
+                    end
+                end
+                print(bestScore)
+                io.close(file)
+
+                file = io.open(path,"w+")
+                
+                if tonumber(bestScore)<contador then
+                    file:write(contador)
+                else
+                    file:write(bestScore)
+                end
+                -- Close the file handle
+                io.close( file )
+                io.flush() 
+                file = nil
+
+                -------------------------------------------------------------------------
+
             else--if event.object2.type == "SUELO" then
             	
             	playerStatus = false
@@ -521,10 +554,11 @@ function scene:show( event )
 
         player.x = 50
         player.y = 180
+        player.gravityScale=1
 
         pauseStatus  = false
 		BotonPausa:setEnabled(true)
-
+        speedTemporal=3
 
 		 
 

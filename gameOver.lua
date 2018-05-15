@@ -12,6 +12,8 @@ local scene = composer.newScene()
  local bg
  local etrellas --ETRELLAS? LOL
  local gameOverMusic 
+ local bestScore ---- MEJOR SCORE
+ local textScore=""
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -69,6 +71,37 @@ function scene:create( event )
         onEvent = againButtonEvent,
     }
     sceneGroup:insert(main)
+
+
+
+    ------------------------------ SCORE -------------------------------------
+
+    ---------------------------- OBTENER PUNTAJE ----------------------------
+    local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
+ 
+    -- Open the file handle
+    local file, errorString = io.open(path, "r" )
+            
+    if not file then
+    -- Error occurred; output the cause
+        print( "File error: " .. errorString )
+    else
+        -- Output lines
+        for line in file:lines() do
+            bestScore=line  
+            print(line) 
+        end
+        -- Close the file handle
+        io.close( file )
+    end
+                 
+    file = nil
+    -------------------------------------------------------------------------
+
+    textScore = display.newText("Mejor puntaje: "..bestScore, 60, 20, native.systemFontBold, 24) 
+    textScore:setTextColor(1,1,1)
+    sceneGroup:insert(textScore)
+    --------------------------------------------------------------------------
 end
  
  
