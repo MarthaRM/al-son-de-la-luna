@@ -270,17 +270,19 @@ local function onCollision(self, event)
                 physics.pause()
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
-                ---------------------------- GUARDAR PUNTAJE ----------------------------
+                ------------------------------ GUARDAR PUNTAJE ----------------------------
                 local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
                 local bestScore
+                
                 -- Open the file handle
-                local file = io.open( path, "a+" )
+                file = io.open( path, "a+" )
 
                 for line in file:lines() do
                     if line~=nil then
                         bestScore=line
                     else
                         bestScore="0"
+                        file:write("0")
                     end
                 end
                 print(bestScore)
@@ -295,7 +297,6 @@ local function onCollision(self, event)
                 end
                 -- Close the file handle
                 io.close( file )
-                io.flush() 
                 file = nil
 
                 -------------------------------------------------------------------------

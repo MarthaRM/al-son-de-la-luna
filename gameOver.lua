@@ -13,7 +13,7 @@ local scene = composer.newScene()
  local etrellas --ETRELLAS? LOL
  local gameOverMusic 
  local bestScore ---- MEJOR SCORE
- local textScore=""
+ local textScore
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -88,8 +88,10 @@ function scene:create( event )
     else
         -- Output lines
         for line in file:lines() do
-            bestScore=line  
-            print(line) 
+            if bestScore==nil then
+                bestScore=line  
+                print("GameOver"..line) 
+            end
         end
         -- Close the file handle
         io.close( file )
@@ -100,7 +102,7 @@ function scene:create( event )
 
     textScore = display.newText("Mejor puntaje: "..bestScore, 60, 20, native.systemFontBold, 24) 
     textScore:setTextColor(1,1,1)
-    sceneGroup:insert(textScore)
+    sceneGroup:insert(textScore) 
     --------------------------------------------------------------------------
 end
  
@@ -113,11 +115,34 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        ---------------------------- OBTENER PUNTAJE ----------------------------
+        local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
+     
+        -- Open the file handle
+        local file, errorString = io.open(path, "r" )
+                
+        if not file then
+            -- Error occurred; output the cause
+            print( "File error: " .. errorString )
+        else
+            -- Output lines
+            for line in file:lines() do
+                bestScore=line  
+                print("GameOver"..line) 
+            end
+            -- Close the file handle
+            io.close( file )
+        end
+                     
+        file = nil
+        print("ACTUALIZANDO ON SCREEN "..bestScore)
+        textScore.text = "Mejor puntaje: "..bestScore
+
+        -------------------------------------------------------------------------
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         ----MUSICA---
-        print("GAMEOVER")
         gameOverMusic = audio.loadStream( "music/gameover.wav" )
         audio.play( gameOverMusic, { channel=3, loops=-1, fadein=100 })
  
@@ -152,8 +177,7 @@ function scene:destroy( event )
     -- Code here runs prior to the removal of scene's view
  
 end
- 
- 
+
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
 -- -----------------------------------------------------------------------------------

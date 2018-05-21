@@ -87,6 +87,25 @@ function scene:create( event )
     --BotonJugar:addEventListener("tap",changeScenes)
     --BotonCred:addEventListener("tap",changeScenes)
 
+    local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
+   
+    -- VERIFICANDO ARCHIVO --
+    local file = io.open( path, "r" )
+    
+    if not file then
+        -- Error occurred; output the cause
+        print("NO EXISTE")
+        file = io.open( path, "w" )
+        file:write("0")
+        io.close( file )
+        file = nil
+    else
+        print("EXISTE")
+        io.close( file )
+    end
+                 
+    file = nil
+
 end
  
  
