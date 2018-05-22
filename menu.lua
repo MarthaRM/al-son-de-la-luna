@@ -12,6 +12,7 @@ screenBottom = screenTop + screenHeight
 display.contentWidht = screendWidth
 display.contentHeight = screenHeight
 local menuMusic
+local text
 
  
 -- -----------------------------------------------------------------------------------
@@ -88,7 +89,8 @@ function scene:create( event )
     --BotonCred:addEventListener("tap",changeScenes)
 
     local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
-   
+
+    
     -- VERIFICANDO ARCHIVO --
     local file = io.open( path, "r" )
     
@@ -99,6 +101,10 @@ function scene:create( event )
         file:write("0")
         io.close( file )
         file = nil
+        
+        text = display.newText(path, 220, 60, native.systemFontBold, 8 ) 
+        text:setTextColor(1,1,1)
+        sceneGroup:insert(text)
     else
         print("EXISTE")
         io.close( file )

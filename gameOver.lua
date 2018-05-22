@@ -78,7 +78,7 @@ function scene:create( event )
 
     ---------------------------- OBTENER PUNTAJE ----------------------------
     local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
- 
+
     -- Open the file handle
     local file, errorString = io.open(path, "r" )
             

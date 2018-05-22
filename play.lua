@@ -27,6 +27,8 @@ display.contentHeight = screenHeight
 -- -----------------------------------------------------------------------------------
  
  local bg
+ local bgAdorno
+ local bgAdorno2
  local planet1
  local planet2
  local player
@@ -211,6 +213,20 @@ local function scrollElementPiso(self, event)
     end
 end
 
+local function scrollElementBack(self, event)
+    self.speed=speed
+    -- if self.x < (display.contentWidth/2)*(-1) then
+    if self.x < (self.width / 2 *(-1) - 50) then
+
+        self.x = display.contentCenterX + self.width + 30
+
+    else
+
+        self.x = self.x - self.speed
+    
+    end
+end
+
 -- ------------------------------------------------------
 -- touchAction()
 --
@@ -360,7 +376,37 @@ function scene:create( event )
             bg.type = "bg"
     sceneGroup:insert(bg) --agrega el elemento a la escena
 
+    bgAdorno = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
+    bgAdorno.x = display.contentCenterX -- pos en x
+    bgAdorno.y = stage.height - 50 -- pos en y
+    bgAdorno.speed = 2
+    bgAdorno.type = "bg"
+    bgAdorno.enterFrame = scrollElementPiso
+    sceneGroup:insert(bgAdorno) --agrega el elemento a la escena
 
+    bgAdorno2 = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
+            bgAdorno2.x = display.contentCenterX + bgAdorno2.width - 2 -- pos en x
+            bgAdorno2.y = stage.height - 50 -- pos en y
+            bgAdorno2.speed = 2
+            bgAdorno2.type = "bg"
+    bgAdorno2.enterFrame = scrollElementPiso
+    sceneGroup:insert(bgAdorno2) --agrega el elemento a la escena
+
+    bgAdorno3 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
+            bgAdorno3.x = display.contentCenterX + bgAdorno2.width -- pos en x
+            bgAdorno3.y = stage.height - 50 -- pos en y
+            bgAdorno3.speed = 2
+            bgAdorno3.type = "bg"
+    bgAdorno3.enterFrame = scrollElementBack
+    sceneGroup:insert(bgAdorno3) --agrega el elemento a la escena
+
+    bgAdorno4 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
+            bgAdorno4.x = display.contentCenterX + bgAdorno2.width -- pos en x
+            bgAdorno4.y = stage.height - 50 -- pos en y
+            bgAdorno4.speed = 2
+            bgAdorno4.type = "bg"
+    bgAdorno4.enterFrame = scrollElementBack
+    sceneGroup:insert(bgAdorno4) --agrega el elemento a la escena
     -- PLANETS
     planet1 = display.newImage("images/1.png")
             planet1.x = 50
@@ -578,11 +624,14 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", planet5)
         Runtime:addEventListener("enterFrame", planet6)
         Runtime:addEventListener("enterFrame", obstaculo)
-        --Runtime:addEventListener("enterFrame", piedra)
         Runtime:addEventListener("enterFrame", piso1)
         Runtime:addEventListener("enterFrame", piso2)
         Runtime:addEventListener("touch", touchAction)
         Runtime:addEventListener("collision", player)
+        Runtime:addEventListener("enterFrame", bgAdorno)
+        Runtime:addEventListener("enterFrame", bgAdorno2)
+        Runtime:addEventListener("enterFrame", bgAdorno3)
+        Runtime:addEventListener("enterFrame", bgAdorno4)
         --pauseStatus  = false
       	playerStatus=false
       	print("start did phase ", playerStatus)
