@@ -107,6 +107,9 @@ function scene:create( event )
         sceneGroup:insert(text)
     else
         print("EXISTE")
+        --[[text = display.newText(path, 220, 60, native.systemFontBold, 8 ) 
+        text:setTextColor(1,1,1)
+        sceneGroup:insert(text)]]
         io.close( file )
     end
                  

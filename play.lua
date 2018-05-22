@@ -49,6 +49,9 @@ display.contentHeight = screenHeight
  local pauseStatus =false
  local playerStatus = false
  local playMusic
+ local bestScore
+ local menuPause
+ local moon
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -65,16 +68,22 @@ local function BotonesPausa(event)
         	BotonPausa:setEnabled(true)
         	pauseStatus  = false
         	playerStatus=false
-        	print("start reanudar ",playerStatus)
+        	--print("start reanudar ",playerStatus)
         	physics.start()
             --reanuda sprite jugador
             player:play()
             -- reanuda sprite obstaculo
             obstaculo:play()
+            --Elimina imagen de menu de pausa
+            menuPause:removeSelf()
+            --continuaro con rotacion de la luna
+            moon.pause = false
 		elseif id =="Menu" then
 			BotonReanudar:removeSelf()
 			BotonMenu:removeSelf()
-			
+
+			--Elimina imagen de menu de pausa
+            menuPause:removeSelf()
 
        		playerStatus=false
 			composer.gotoScene("menu",{effect="fade",time=500})
@@ -90,24 +99,33 @@ local function handleButtonEvent(event)
     local id = event.target.id
     if "ended" == phase then
         if id == "Pause" then
-        	print("wtf")
+        	--print("wtf")
         	BotonPausa:setEnabled(false)
         	temporaryspeed = speed
         	speed = 0
+            --detener rotacion de la luna
+            moon.pause = true
+
         	counterStatus = false
-        	print("pause pausa",playerStatus)
+        	--print("pause pausa",playerStatus)
         	physics.pause()
             --detiene sprite jugador
             player:pause()
             -- detiene sprite obstaculo
             obstaculo:pause()
             pauseStatus  = true
+
+            -- Imagen de Menu de pausa
+            menuPause = display.newImage("images/MenuPause.png")-- mostrar la imagen en pantalla
+            menuPause.x = display.contentCenterX-- + menuPause.width - 2 -- pos en x
+            menuPause.y = display.contentCenterY-- + menuPause.width - 2 -- pos en y
+
 		    BotonReanudar = widget.newButton
 		    {
-		        left = stage.width/2 - 75,
-      			top = stage.height/2 - 30,
-		        width = 150,
-		        height = 40,
+		        left = display.contentCenterX - 65,
+      			top = stage.height/2 - 25,
+		        width = 130,
+		        height = 33,
 		        defaultFile = "images/B.Rean.png",
 		        overFile="images/B.ReanPressed.png",
 		        id = "Reanudar",
@@ -115,10 +133,10 @@ local function handleButtonEvent(event)
 		    }
 		    BotonMenu = widget.newButton
 		    {
-		        left = stage.width/2 - 75,
-       			top = stage.height/2 + 30,
-		        width = 150,
-		        height = 40,
+		        left = display.contentCenterX - 65,
+       			top = stage.height/2 + 25,
+		        width = 130,
+		        height = 33,
 		        defaultFile = "images/B.Menu.png",
 		        overFile="images/B.MenuPressed.png",
 		        id = "Menu",
@@ -288,7 +306,7 @@ local function onCollision(self, event)
                 
                 ------------------------------ GUARDAR PUNTAJE ----------------------------
                 local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
-                local bestScore
+                --bestScore
                 
                 -- Open the file handle
                 file = io.open( path, "a+" )
@@ -296,8 +314,10 @@ local function onCollision(self, event)
                 for line in file:lines() do
                     if line~=nil then
                         bestScore=line
+                        --print("Line"..line)
+
                     else
-                        bestScore="0"
+                        bestScore="1"
                         file:write("0")
                     end
                 end
@@ -305,7 +325,8 @@ local function onCollision(self, event)
                 io.close(file)
 
                 file = io.open(path,"w+")
-                
+                --bestScore="1"
+
                 if tonumber(bestScore)<contador then
                     file:write(contador)
                 else
@@ -357,6 +378,17 @@ local function makeSprite(name, time, w, h, frames, file)
     local sprite =  graphics.newImageSheet( file, options )
     return display.newSprite(sprite, sequenceData) 
 end
+
+
+
+local function rotate( self )
+    if self.pause then
+        self.rotation = self.rotation
+    else
+        self.rotation = self.rotation + 0.2
+    end
+end 
+
 -- ------------------------------------------------------
 -- create()
 -- Crea una nueva escena inicializando sus elementos
@@ -376,37 +408,16 @@ function scene:create( event )
             bg.type = "bg"
     sceneGroup:insert(bg) --agrega el elemento a la escena
 
-    bgAdorno = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
-    bgAdorno.x = display.contentCenterX -- pos en x
-    bgAdorno.y = stage.height - 50 -- pos en y
-    bgAdorno.speed = 2
-    bgAdorno.type = "bg"
-    bgAdorno.enterFrame = scrollElementPiso
-    sceneGroup:insert(bgAdorno) --agrega el elemento a la escena
-
-    bgAdorno2 = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
-            bgAdorno2.x = display.contentCenterX + bgAdorno2.width - 2 -- pos en x
-            bgAdorno2.y = stage.height - 50 -- pos en y
-            bgAdorno2.speed = 2
-            bgAdorno2.type = "bg"
-    bgAdorno2.enterFrame = scrollElementPiso
-    sceneGroup:insert(bgAdorno2) --agrega el elemento a la escena
-
-    bgAdorno3 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
-            bgAdorno3.x = display.contentCenterX + bgAdorno2.width -- pos en x
-            bgAdorno3.y = stage.height - 50 -- pos en y
-            bgAdorno3.speed = 2
-            bgAdorno3.type = "bg"
-    bgAdorno3.enterFrame = scrollElementBack
-    sceneGroup:insert(bgAdorno3) --agrega el elemento a la escena
-
-    bgAdorno4 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
-            bgAdorno4.x = display.contentCenterX + bgAdorno2.width -- pos en x
-            bgAdorno4.y = stage.height - 50 -- pos en y
-            bgAdorno4.speed = 2
-            bgAdorno4.type = "bg"
-    bgAdorno4.enterFrame = scrollElementBack
-    sceneGroup:insert(bgAdorno4) --agrega el elemento a la escena
+    moon = display.newImageRect("images/Luna.png", 350, 350)
+            moon.x = display.contentCenterX
+            moon.y = display.contentCenterY + 80
+            moon.rotation = 0
+            moon.reverse = 1
+            moon.enterFrame = rotate
+            moon.pause = false
+    sceneGroup:insert(moon) 
+    
+    
     -- PLANETS
     planet1 = display.newImage("images/1.png")
             planet1.x = 50
@@ -471,6 +482,42 @@ function scene:create( event )
             planet8.type = "bg"
     planet8.enterFrame = scrollElement
     sceneGroup:insert(planet8) 
+
+
+    
+
+
+    bgAdorno = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
+    bgAdorno.x = display.contentCenterX -- pos en x
+    bgAdorno.y = stage.height - 50 -- pos en y
+    bgAdorno.speed = 2
+    bgAdorno.type = "bg"
+    bgAdorno.enterFrame = scrollElementPiso
+    sceneGroup:insert(bgAdorno) --agrega el elemento a la escena
+
+    bgAdorno2 = display.newImage("images/Background.png")-- mostrar la imagen en pantalla
+            bgAdorno2.x = display.contentCenterX + bgAdorno2.width - 2 -- pos en x
+            bgAdorno2.y = stage.height - 50 -- pos en y
+            bgAdorno2.speed = 2
+            bgAdorno2.type = "bg"
+    bgAdorno2.enterFrame = scrollElementPiso
+    sceneGroup:insert(bgAdorno2) --agrega el elemento a la escena
+
+    bgAdorno3 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
+            bgAdorno3.x = display.contentCenterX + bgAdorno2.width -- pos en x
+            bgAdorno3.y = stage.height - 50 -- pos en y
+            bgAdorno3.speed = 2
+            bgAdorno3.type = "bg"
+    bgAdorno3.enterFrame = scrollElementBack
+    sceneGroup:insert(bgAdorno3) --agrega el elemento a la escena
+
+    bgAdorno4 = display.newImage("images/Misc.png")-- mostrar la imagen en pantalla
+            bgAdorno4.x = display.contentCenterX + bgAdorno2.width -- pos en x
+            bgAdorno4.y = stage.height - 50 -- pos en y
+            bgAdorno4.speed = 2
+            bgAdorno4.type = "bg"
+    bgAdorno4.enterFrame = scrollElementBack
+    sceneGroup:insert(bgAdorno4) --agrega el elemento a la escena
 
     -- OBSTACULOS
     -- Para los obstaculos, se crea una ImageSeet para cada sprite
@@ -576,6 +623,11 @@ function scene:create( event )
     currentTimeText = display.newText(contador, 20, 20, native.systemFontBold, 24) 
     currentTimeText:setTextColor(1,1,1)
     sceneGroup:insert(currentTimeText)
+
+
+
+
+
 end
  
  
@@ -610,13 +662,20 @@ function scene:show( event )
 		 
 
         player:setLinearVelocity(0,800)
-		currentTimeText.text="Puntaje: "..0
+		currentTimeText.text="0"
 		playerStatus=false
 		print("start will phase",playerStatus)
 		physics.start()
+
+        
+        
+            
+  
+
  		 
 
     elseif ( phase == "did" ) then
+        Runtime:addEventListener("enterFrame", moon)
         Runtime:addEventListener("enterFrame", planet1)
         Runtime:addEventListener("enterFrame", planet2)
         Runtime:addEventListener("enterFrame", planet3)
@@ -681,7 +740,7 @@ local function timerUp()
     end
     if counterStatus == true then
         contador = contador + 1
-        currentTimeText.text = "Puntaje: "..contador
+        currentTimeText.text = ""..contador
     end
 end
 
