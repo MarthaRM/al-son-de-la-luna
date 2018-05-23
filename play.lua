@@ -639,8 +639,7 @@ function scene:create( event )
 
     powerUpText = display.newText("", display.contentCenterX/3 , screenHeight/3, native.systemFontBold, 36) 
     powerUpText:setTextColor(0,1,0)
-    sceneGroup:insert(powerUpText) 
-    transition.blink( powerUpText, { time=2000 } )    
+    sceneGroup:insert(powerUpText)  
 
 
 
@@ -754,7 +753,7 @@ end
 -- Contador
 local function timerUp()
     if speed<25 and pauseStatus~=true then
-        speed = speed*1.01
+        speed = speed*1.02
     end
     if counterStatus == true then
         contador = contador + 1

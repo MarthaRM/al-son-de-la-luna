@@ -135,7 +135,7 @@ function scene:create( event )
     }
     sceneGroup:insert(main)
 
-    textScore = display.newText("Mejor puntaje: "..bestScore, 60, 20, native.systemFontBold, 24) 
+    textScore = display.newText("Mejor puntaje: "..bestScore, 80, 20, native.systemFontBold, 24) 
     textScore:setTextColor(1,1,1)
     sceneGroup:insert(textScore) 
     --------------------------------------------------------------------------
