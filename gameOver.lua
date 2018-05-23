@@ -135,51 +135,6 @@ function scene:create( event )
     }
     sceneGroup:insert(main)
 
-
-
-    ------------------------------ SCORE -------------------------------------
-
-    --[[-------------------------- OBTENER PUNTAJE ----------------------------
-    local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
-
-    -- Open the file handle
-    file, errorString = io.open(path, "a" )
-            
-    if not file then
-    -- Error occurred; output the cause
-        print( "File error: " .. errorString )
-    else
-        -- Output lines
-        bestScore=file:read("*n")
-        if bestScore == nil then
-            bestScore=0
-        end
-        print("_G.score Over ".._G.score.." bestScore "..bestScore)
-        if bestScore<_G.score then
-            bestScore=_G.score
-        end
-        -- Close the file handle
-        io.close( file )
-    end
-                 
-    file = nil
-
-    file, errorString = io.open(path, "w" )
-            
-    if not file then
-    -- Error occurred; output the cause
-        print( "File error: " .. errorString )
-    else
-        file:write(bestScore)
-        -- Close the file handle
-        io.close( file )
-        print("new bestScore "..bestScore)
-    end
-                 
-    file = nil
-    -------------------------------------------------------------------------
-    --bestScore="1"]]
-
     textScore = display.newText("Mejor puntaje: "..bestScore, 60, 20, native.systemFontBold, 24) 
     textScore:setTextColor(1,1,1)
     sceneGroup:insert(textScore) 

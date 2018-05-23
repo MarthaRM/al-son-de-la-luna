@@ -1,6 +1,6 @@
 local composer = require( "composer" )
- 
 local scene = composer.newScene()
+
 centerX = display.contentCenterX
 centerY = display.contentCenterY
 screenLeft = display.screenOriginX
@@ -11,6 +11,7 @@ screenHeight = display.contentHeight - screenTop * 2
 screenBottom = screenTop + screenHeight 
 display.contentWidht = screendWidth
 display.contentHeight = screenHeight
+
 local menuMusic
 local text
 
@@ -35,11 +36,9 @@ local function handleButtonEvent (event)
     local id = event.target.id
     if "ended" == phase then
         if id == "Jugar" then
-            composer.gotoScene("play", {effect = "slideUp", time = 1000})
-            print(id)
+            composer.gotoScene("tuto", {effect = "fade", time = 1000})
         else
             composer.gotoScene("credits", {effect = "slideLeft", time = 1000})
-            print(id)
         end
     end
     
@@ -51,7 +50,6 @@ function scene:create( event )
     local widget  = require ("widget")
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-
     bg = display.newImage("images/MenuPrincipal.png")-- mostrar la imagen en pantalla
             bg.x = centerX -- pos en x
             bg.y = centerY -- pos en y
@@ -143,9 +141,6 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        audio.fadeOut( { channel=1, time=1000 } )
-        audio.stop(1)
-        audio.rewind({channel=1})
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
