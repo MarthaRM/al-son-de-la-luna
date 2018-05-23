@@ -7,6 +7,7 @@ local widget = require ("widget")
 local physics = require ("physics")
 -- stage = tamaño pantalla
 _G.stage = display.getCurrentStage()
+_G.score = 0
 physics.setDrawMode("normal")
 physics.start() 
 physics.setGravity(0, 40)
@@ -304,18 +305,21 @@ local function onCollision(self, event)
                 physics.pause()
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
-                ------------------------------ GUARDAR PUNTAJE ----------------------------
+                --[[---------------------------- GUARDAR PUNTAJE ----------------------------
                 local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
                 --bestScore
                 
                 -- Open the file handle
                 file = io.open( path, "a+" )
 
-                for line in file:lines() do
+                bestScore=file:read("*n")
+
+                if bestScore == nil then
+                    bestScore=0
+                end
+                --for line in file:lines() do
                     if line~=nil then
                         bestScore=line
-                        --print("Line"..line)
-
                     else
                         bestScore="1"
                         file:write("0")
@@ -323,21 +327,22 @@ local function onCollision(self, event)
                 end
                 print(bestScore)
                 io.close(file)
-
+                file=nil
                 file = io.open(path,"w+")
                 --bestScore="1"
 
-                if tonumber(bestScore)<contador then
+                if bestScore<contador then
                     file:write(contador)
                 else
                     file:write(bestScore)
                 end
                 -- Close the file handle
                 io.close( file )
-                file = nil
+                file = nil]]
 
                 -------------------------------------------------------------------------
-
+                _G.score = contador
+                print("_G score ".._G.score)
             else--if event.object2.type == "SUELO" then
             	
             	playerStatus = false

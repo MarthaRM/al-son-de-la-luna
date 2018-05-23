@@ -12,7 +12,7 @@ local scene = composer.newScene()
  local bg
  local etrellas --ETRELLAS? LOL
  local gameOverMusic 
- local bestScore ---- MEJOR SCORE
+ local bestScore="0" ---- MEJOR SCORE
  local textScore
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -139,30 +139,46 @@ function scene:create( event )
 
     ------------------------------ SCORE -------------------------------------
 
-    ---------------------------- OBTENER PUNTAJE ----------------------------
+    --[[-------------------------- OBTENER PUNTAJE ----------------------------
     local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
 
     -- Open the file handle
-    file, errorString = io.open(path, "r" )
+    file, errorString = io.open(path, "a" )
             
     if not file then
     -- Error occurred; output the cause
         print( "File error: " .. errorString )
     else
         -- Output lines
-        for line in file:lines() do
-            if bestScore==nil then
-                bestScore=line  
-                print("GameOver"..line) 
-            end
+        bestScore=file:read("*n")
+        if bestScore == nil then
+            bestScore=0
+        end
+        print("_G.score Over ".._G.score.." bestScore "..bestScore)
+        if bestScore<_G.score then
+            bestScore=_G.score
         end
         -- Close the file handle
         io.close( file )
     end
                  
     file = nil
+
+    file, errorString = io.open(path, "w" )
+            
+    if not file then
+    -- Error occurred; output the cause
+        print( "File error: " .. errorString )
+    else
+        file:write(bestScore)
+        -- Close the file handle
+        io.close( file )
+        print("new bestScore "..bestScore)
+    end
+                 
+    file = nil
     -------------------------------------------------------------------------
-    --bestScore="1"
+    --bestScore="1"]]
 
     textScore = display.newText("Mejor puntaje: "..bestScore, 60, 20, native.systemFontBold, 24) 
     textScore:setTextColor(1,1,1)
@@ -190,9 +206,14 @@ function scene:show( event )
             print( "File error: " .. errorString )
         else
             -- Output lines
-            for line in file:lines() do
-                bestScore=line  
-                print("GameOver"..line) 
+            bestScore=file:read("*n")
+            print("MEJOR SCORE "..bestScore)
+            if bestScore == nil then
+                bestScore=0
+                print("Fue nil")
+            end
+            if bestScore<_G.score then
+                bestScore=_G.score
             end
             -- Close the file handle
             io.close( file )
@@ -201,6 +222,20 @@ function scene:show( event )
         file = nil
         print("ACTUALIZANDO ON SCREEN "..bestScore)
         textScore.text = "Mejor puntaje: "..bestScore
+
+        file, errorString = io.open(path, "w" )
+            
+        if not file then
+        -- Error occurred; output the cause
+            print( "File error: " .. errorString )
+        else
+            file:write(bestScore)
+            -- Close the file handle
+            io.close( file )
+            print("new bestScore "..bestScore)
+        end
+                     
+        file = nil
 
         -------------------------------------------------------------------------
  
