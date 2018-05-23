@@ -94,19 +94,12 @@ function scene:create( event )
     
     if not file then
         -- Error occurred; output the cause
-        print("NO EXISTE")
         file=nil
         file = io.open( path, "w+" )
         file:write("0")
         io.close( file )
         file = nil
-        
-        text = display.newText(path, 220, 60, native.systemFontBold, 8 ) 
-        text:setTextColor(1,1,1)
-        sceneGroup:insert(text)
     else
-        print("EXISTE")
-        
         io.close( file )
     end
                  

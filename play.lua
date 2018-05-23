@@ -30,6 +30,7 @@ display.contentHeight = screenHeight
  local bg
  local bgAdorno
  local bgAdorno2
+ local decoradorScore --Barrita de score
  local planet1
  local planet2
  local powerUp --TEQUILA!
@@ -40,7 +41,7 @@ display.contentHeight = screenHeight
  local contador = 0
  local speed = 2
  local timerUpTimer
- local currentTimeText = 0
+ local currentTimeText = "Puntaje: 0"
  local counterStatus = true
  local triangleShape = { 0,-12, 12,30, -12,30 }
  local BotonReanudar
@@ -56,6 +57,7 @@ display.contentHeight = screenHeight
  local menuPause
  local moon
  local powerUpCoolDown = false
+ local powerUpText
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -302,8 +304,6 @@ local function touchAction( event )
                 else
                     player.gravityScale=1.5
                 end
-		        print("salta")
-
                 --cambia secuncia del jugador para que se detenga en un frame y aparente brincar
                 player:setFrame(2)
                 player:pause()
@@ -332,11 +332,13 @@ local function onCollision(self, event)
                 _G.score = contador
 
             else--if event.object2.type == "SUELO" then
-                if event.object1.type == "powerUp" then
-                    contador=contador+20
+                if event.object1.type == "powerUp" and powerUpCoolDown ~= true then
                     powerUpCoolDown = true
+                    extra=math.random(20,100)
+                    contador=contador+extra
                     effectMusic = audio.loadStream( "music/grito.wav" )
                     audio.play( effectMusic, { channel=4 })
+                    powerUpText.text = "+"..extra
                 end
             	playerStatus = false
                 --cambia secuancia de jugador para que aparen caminar
@@ -397,7 +399,7 @@ function scene:create( event )
  -- esto es de composer pero la verdad no se que es :B
     local sceneGroup = self.view
 
-    -- BACKGROUND
+    -- BACKGROUND Y ESCENA
     bg = display.newImage("images/FondoJuego.png")-- mostrar la imagen en pantalla
                     bg.x = centerX -- pos en x
                     bg.y = centerY -- pos en y
@@ -414,7 +416,6 @@ function scene:create( event )
             moon.enterFrame = rotate
             moon.pause = false
     sceneGroup:insert(moon) 
-    
     
     -- PLANETS
     planet1 = display.newImage("images/1.png")
@@ -611,6 +612,13 @@ function scene:create( event )
     sceneGroup:insert(piso1)
     sceneGroup:insert(piso2)
 
+    decoradorScore= display.newImage("images/Barra.png")-- mostrar la imagen en pantalla
+    decoradorScore.x = 0 -- pos en x
+    decoradorScore.y = 15 -- pos en y
+    decoradorScore.type = "bg"
+    decoradorScore.height = 45
+    decoradorScore.width = 320
+    sceneGroup:insert(decoradorScore) --agrega el elemento a la escena
 
      BotonPausa = widget.newButton
         {
@@ -625,11 +633,14 @@ function scene:create( event )
         }
     sceneGroup:insert(BotonPausa)
 
-    currentTimeText = display.newText(contador, 20, 20, native.systemFontBold, 24) 
+    currentTimeText = display.newText("Puntaje: "..contador, 50, 20, native.systemFontBold, 24) 
     currentTimeText:setTextColor(1,1,1)
     sceneGroup:insert(currentTimeText)
 
-
+    powerUpText = display.newText("", display.contentCenterX/3 , screenHeight/3, native.systemFontBold, 36) 
+    powerUpText:setTextColor(0,1,0)
+    sceneGroup:insert(powerUpText) 
+    transition.blink( powerUpText, { time=2000 } )    
 
 
 
@@ -672,7 +683,6 @@ function scene:show( event )
         player:setLinearVelocity(0,800)
 		currentTimeText.text="0"
 		playerStatus=false
-		print("start will phase",playerStatus)
 		physics.start()
 
         
@@ -702,7 +712,6 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", powerUp)
         --pauseStatus  = false
       	playerStatus=false
-      	print("start did phase ", playerStatus)
       	physics.start()
 
         ----MUSICA---
@@ -745,17 +754,17 @@ end
 -- Contador
 local function timerUp()
     if speed<25 and pauseStatus~=true then
-        speed = speed*1.03
+        speed = speed*1.01
     end
     if counterStatus == true then
         contador = contador + 1
-        currentTimeText.text = ""..contador
+        currentTimeText.text = "Puntaje: "..contador
+        powerUpText.text = " "        
     end
 end
 
 timerUpTimer = timer.performWithDelay(1000, timerUp, 0)
 
- 
  
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners

@@ -21,10 +21,8 @@ local function againButtonEvent (event)
     local phase = event.phase
     if "ended" == phase then
         if event.target.id == "main" then
-            print ("main")
             composer.gotoScene("menu", {effect = "fade", time = 500})
         elseif event.target.id == "again" then
-            print("again")
             composer.gotoScene("play", {effect = "fade", time = 500})
         end
     end
@@ -108,6 +106,8 @@ function scene:create( event )
     local menuGameO = display.newImage("images/GameOver.png")-- mostrar la imagen en pantalla
     menuGameO.x = display.contentCenterX-- + menuPause.width - 2 -- pos en x
     menuGameO.y = display.contentCenterY-- + menuPause.width - 2 -- pos en y
+    menuGameO.width = screenWidth/2 + 40
+    menuGameO.height = screenHeight - 60
     sceneGroup:insert(menuGameO) 
 
     again = widget.newButton
@@ -164,7 +164,7 @@ function scene:show( event )
             bestScore=file:read("*n")
             print("MEJOR SCORE "..bestScore)
             if bestScore == nil then
-                bestScore=0
+                bestScore=
                 print("Fue nil")
             end
             if bestScore<_G.score then
@@ -187,7 +187,6 @@ function scene:show( event )
             file:write(bestScore)
             -- Close the file handle
             io.close( file )
-            print("new bestScore "..bestScore)
         end
                      
         file = nil
