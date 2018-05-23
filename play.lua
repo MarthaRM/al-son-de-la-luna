@@ -32,6 +32,7 @@ display.contentHeight = screenHeight
  local bgAdorno2
  local planet1
  local planet2
+ local powerUp --TEQUILA!
  local player
  local obstaculo
  local floor
@@ -50,9 +51,11 @@ display.contentHeight = screenHeight
  local pauseStatus =false
  local playerStatus = false
  local playMusic
+ local effectMusic
  local bestScore
  local menuPause
  local moon
+ local powerUpCoolDown = false
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -246,6 +249,28 @@ local function scrollElementBack(self, event)
     end
 end
 
+local function scrollElementPowrUp(self, event)
+    self.speed=speed
+    -- if self.x < (display.contentWidth/2)*(-1) then
+    res = math.random(1,1000)
+    res2 = math.random(1,1000)
+
+    if powerUpCoolDown == true then
+        self.x = -100
+        powerUpCoolDown = false
+    end
+
+    if self.x < (self.width / 2 *(-1) - 50) and res==17 and res2>500 then
+
+        self.x = display.contentCenterX * 3
+
+    else
+
+        self.x = self.x - self.speed
+    
+    end
+end
+
 -- ------------------------------------------------------
 -- touchAction()
 --
@@ -296,57 +321,24 @@ end
 -- Detecta colisiones entre obstaculos y personaje
 -- ------------------------------------------------------
 local function onCollision(self, event)
-
     if event.phase == "began" then
         ---if event.object2.type == "obstacle" then
-            if event.object2.type ~= "SUELO" then
+            if event.object2.type ~= "SUELO" and event.object1.type ~= "powerUp" then
                 counterStatus=false
                 speed=0
                 physics.pause()
                 composer.gotoScene("gameOver",{effect="fade", time=500})
                 
-                --[[---------------------------- GUARDAR PUNTAJE ----------------------------
-                local path = system.pathForFile( "score.txt", system.DocumentsDirectory)
-                --bestScore
-                
-                -- Open the file handle
-                file = io.open( path, "a+" )
-
-                bestScore=file:read("*n")
-
-                if bestScore == nil then
-                    bestScore=0
-                end
-                --for line in file:lines() do
-                    if line~=nil then
-                        bestScore=line
-                    else
-                        bestScore="1"
-                        file:write("0")
-                    end
-                end
-                print(bestScore)
-                io.close(file)
-                file=nil
-                file = io.open(path,"w+")
-                --bestScore="1"
-
-                if bestScore<contador then
-                    file:write(contador)
-                else
-                    file:write(bestScore)
-                end
-                -- Close the file handle
-                io.close( file )
-                file = nil]]
-
-                -------------------------------------------------------------------------
                 _G.score = contador
-                print("_G score ".._G.score)
+
             else--if event.object2.type == "SUELO" then
-            	
+                if event.object1.type == "powerUp" then
+                    contador=contador+20
+                    powerUpCoolDown = true
+                    effectMusic = audio.loadStream( "music/grito.wav" )
+                    audio.play( effectMusic, { channel=4 })
+                end
             	playerStatus = false
-            	--print(player.y)
                 --cambia secuancia de jugador para que aparen caminar
                 player:setSequence("walking")
                 --incia sprite nuevamente, al cambiar de secuencia el sprite se detiene
@@ -356,6 +348,7 @@ local function onCollision(self, event)
         --end
     end
 end
+
 -- ------------------------------------------------------
 -- makeSprite()
 --
@@ -488,7 +481,14 @@ function scene:create( event )
     planet8.enterFrame = scrollElement
     sceneGroup:insert(planet8) 
 
-
+    powerUp =display.newImage("images/tequila.png")
+            powerUp.x = 700
+            powerUp.y = 135
+            powerUp.speed = speed
+            powerUp.type = "powerUp"
+    powerUp.enterFrame = scrollElementPowrUp
+    physics.addBody(powerUp, "static", {isSensor=true, density=3, bounce = 0})
+    sceneGroup:insert(powerUp) 
     
 
 
@@ -659,7 +659,10 @@ function scene:show( event )
         player.x = 50
         player.y = 180
         player.gravityScale=1
-
+        
+        powerUp.x = -100
+        powerUp.y = 135
+        
         pauseStatus  = false
 		BotonPausa:setEnabled(true)
         speedTemporal=3
@@ -696,6 +699,7 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", bgAdorno2)
         Runtime:addEventListener("enterFrame", bgAdorno3)
         Runtime:addEventListener("enterFrame", bgAdorno4)
+        Runtime:addEventListener("enterFrame", powerUp)
         --pauseStatus  = false
       	playerStatus=false
       	print("start did phase ", playerStatus)

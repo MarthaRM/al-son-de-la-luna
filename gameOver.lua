@@ -243,7 +243,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         ----MUSICA---
         gameOverMusic = audio.loadStream( "music/gameover.wav" )
-        audio.play( gameOverMusic, { channel=3, loops=-1, fadein=100 })
+        audio.play( gameOverMusic, { channel=3, fadein=100 })
  
     end
 end
